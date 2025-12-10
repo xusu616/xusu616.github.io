@@ -6,7 +6,7 @@
   var width, height, starCount;
   var stars = [];
   var giantColor = "180,184,240";
-  var starColor = "226,225,142";
+  var starColor = "79,79,125";
   var cometColor = "226,225,224";
 
   function resize() {
