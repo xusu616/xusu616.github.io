@@ -1,0 +1,62 @@
+name: Sync from CNBlogs
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch to sync/build'
+        required: false
+        default: 'gh-pages'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (gh-pages by default)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+          submodules: recursive
+          ref: ${{ github.event.inputs.ref || 'gh-pages' }}
+
+      - name: Show workspace
+        run: |
+          pwd
+          ls -la
+
+      - run: npm install -g hexo-cli
+      # 若你有 package-lock.json，可改回 npm ci；现在用 install 避免锁文件问题
+      - run: npm install
+      - run: npm install hexo-migrator-rss --no-save
+
+      - name: Migrate from CNBlogs
+        run: |
+          set -eux
+          hexo migrate rss https://www.cnblogs.com/xvsu/rss
+
+      - name: Build
+        run: |
+          npx hexo clean
+          npx hexo generate
+
+      - name: Commit and push
+        env:
+          GIT_AUTHOR_NAME: "GitHub Actions"
+          GIT_AUTHOR_EMAIL: "actions@github.com"
+          GIT_COMMITTER_NAME: "GitHub Actions"
+          GIT_COMMITTER_EMAIL: "actions@github.com"
+        run: |
+          git add -A
+          if git diff --quiet --cached; then
+            echo "No changes to commit."
+          else
+            git commit -m "Auto sync from CNBlogs"
+            git push origin HEAD:gh-pages
+          fi
