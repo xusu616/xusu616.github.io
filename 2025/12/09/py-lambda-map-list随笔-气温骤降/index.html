@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>py-lambda-map-list随笔 - 气温骤降 | XvSu's Blog</title><meta name="author" content="XvSu"><meta name="copyright" content="XvSu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="py-lambda-map-list随笔 匿名函数lambda lambda 表达式用于创建 小型、匿名 的单行函数。 语法：lambda arguments: expression 很方便的 map()用于及其方便地映射 把相同的操作（如lambda表达式）映射到后者（如列表上） map() 函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="py-lambda-map-list随笔 - 气温骤降">
+<meta property="og:url" content="http://rd227.github.io/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/index.html">
+<meta property="og:site_name" content="XvSu&#39;s Blog">
+<meta property="og:description" content="py-lambda-map-list随笔 匿名函数lambda lambda 表达式用于创建 小型、匿名 的单行函数。 语法：lambda arguments: expression 很方便的 map()用于及其方便地映射 把相同的操作（如lambda表达式）映射到后者（如列表上） map() 函数">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640">
+<meta property="article:published_time" content="2025-12-09T12:14:00.000Z">
+<meta property="article:modified_time" content="2025-12-10T16:14:52.276Z">
+<meta property="article:author" content="XvSu">
+<meta property="article:tag" content="技术, 编程, 学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "py-lambda-map-list随笔 - 气温骤降",
+  "url": "http://rd227.github.io/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/",
+  "image": "https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640",
+  "datePublished": "2025-12-09T12:14:00.000Z",
+  "dateModified": "2025-12-10T16:14:52.276Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "XvSu",
+      "url": "http://rD227.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640"><link rel="canonical" href="http://rd227.github.io/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.2"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'py-lambda-map-list随笔 - 气温骤降',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/starry.css?v=20231210"><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/TopPic.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">XvSu's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">py-lambda-map-list随笔 - 气温骤降</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">py-lambda-map-list随笔 - 气温骤降</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-12-09T12:14:00.000Z" title="Created 2025-12-09 20:14:00">2025-12-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-12-10T16:14:52.276Z" title="Updated 2025-12-11 00:14:52">2025-12-11</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>py-lambda-map-list随笔 匿名函数lambda lambda 表达式用于创建 小型、匿名 的单行函数。 语法：lambda arguments: expression 很方便的 map()用于及其方便地映射 把相同的操作（如lambda表达式）映射到后者（如列表上） map() 函数</p>
+<!-- more -->
+<p>【摘要】 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/xvsu/p/19328296">阅读全文</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://rD227.github.io">XvSu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://rd227.github.io/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/">http://rd227.github.io/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="https://q1.qlogo.cn/g?b=qq&amp;nk=2329976818&amp;s=640" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/12/09/hello-world/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;  More info: Writing Run server1$ hexo server  More info: Server Generate static files1$ hexo generate  More info: Generating Deploy to remote sites1$ hexo deploy  More info: Deployment </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="https://q1.qlogo.cn/g?b=qq&amp;nk=2329976818&amp;s=640" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">XvSu</div><div class="author-info-description">我尽量吧</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/xxxxx" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="https://www.cnblogs.com/xvsu" target="_blank" title="博客园"><i class="fab fa-blog" style="color: #0066cc;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">目前点没有同步帖子功能，以前的笔记都是纸质的（后续慢慢补充上去~（可能吧））</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/11/Old-Java%E7%B1%BB%E9%9B%86%E6%A1%86%E6%9E%B6%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/" title="Old-Java类集框架随笔 - 气温骤降">Old-Java类集框架随笔 - 气温骤降</a><time datetime="2025-12-10T16:09:00.000Z" title="Created 2025-12-11 00:09:00">2025-12-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/10/py-lambda-map-list%E9%9A%8F%E7%AC%94/" title="py-lambda-map-list随笔">py-lambda-map-list随笔</a><time datetime="2025-12-10T13:40:37.625Z" title="Created 2025-12-10 21:40:37">2025-12-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/09/hello-world/" title="Hello World">Hello World</a><time datetime="2025-12-09T15:40:35.710Z" title="Created 2025-12-09 23:40:35">2025-12-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/09/py-lambda-map-list%E9%9A%8F%E7%AC%94-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/" title="py-lambda-map-list随笔 - 气温骤降">py-lambda-map-list随笔 - 气温骤降</a><time datetime="2025-12-09T12:14:00.000Z" title="Created 2025-12-09 20:14:00">2025-12-09</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By XvSu</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.2"></script><script src="/js/main.js?v=5.5.2"></script><div class="js-pjax"></div><div class="animated-bg"></div><canvas id="universe"></canvas><script src="/js/starry.js?v=20231210"></script><style>
+  .card-author-button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 0 15px;
+  }
+  .card-author-button-group a {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .card-author-button-group .github-btn {
+    background: #24292e;
+    color: white;
+  }
+  .card-author-button-group .github-btn:hover {
+    background: #0d1117;
+  }
+  .card-author-button-group .blog-btn {
+    background: #0066cc;
+    color: white;
+  }
+  .card-author-button-group .blog-btn:hover {
+    background: #0052a3;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var cardInfo = document.querySelector('.card-info');
+    if (cardInfo) {
+      var group = document.createElement('div');
+      group.className = 'card-author-button-group';
+      group.innerHTML = '<a href="https://github.com/rD227" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub</a><a href="https://www.cnblogs.com/xvsu" target="_blank" class="blog-btn"><i class="fas fa-blog"></i> 博客园</a>';
+      cardInfo.appendChild(group);
+    }
+  });
+</script>
+<!-- Ensure we don't pass an undefined asset through url_for() which returns "/" and breaks the fallback--><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
