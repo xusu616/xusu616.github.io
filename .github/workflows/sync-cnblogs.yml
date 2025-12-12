@@ -8,7 +8,7 @@ on:
       ref:
         description: 'Branch to sync/build'
         required: false
-        default: 'gh-pages'
+        default: 'main'
 
 permissions:
   contents: write
