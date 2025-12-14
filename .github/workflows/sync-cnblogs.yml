@@ -1,19 +1,19 @@
 name: Sync from CNBlogs
 
-on:
+on: 
   schedule: 
-    - cron: '0 18 * * *'
+    - cron: '0 18 * * *'  # 每天凌晨 2 点（UTC 18:00）
   workflow_dispatch:
     inputs: 
       ref:
         description:  'Branch to sync/build'
         required: false
-        default: 'main'  # ✅ 改成 main
+        default: 'main'
 
-permissions:
+permissions: 
   contents: write
 
-jobs:
+jobs: 
   sync:
     runs-on: ubuntu-latest
     steps:
@@ -21,36 +21,55 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth:  0
-          persist-credentials:  true
-          submodules: recursive
-          ref: ${{ github. event.inputs.ref || 'main' }}  # ✅ 改成 main
+          fetch-depth: 0
+          persist-credentials: true
+          submodules:  recursive
+          ref: ${{ github.event.inputs.ref || 'main' }}
 
-      - name: Show workspace
-        run:  |
-          pwd
-          ls -la
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - run: npm install -g hexo-cli
-      - run: npm install
-      - run: npm install hexo-migrator-rss --no-save
+      - name: Install Hexo
+        run: npm install -g hexo-cli
 
-      - name:  Migrate from CNBlogs
+      - name: Install dependencies
+        run: npm install
+
+      - name:  Install RSS migrator
+        run: npm install hexo-migrator-rss --no-save
+
+      - name: Clean old posts (avoid duplicates)
         run: |
+          # 删除所有博客园同步的旧文章（通过文件名特征识别）
+          # 这样每次都是全新同步，不会产生重复
+          find source/_posts -name "*-气温骤降*. md" -type f -delete || true
+          echo "Old posts cleaned"
+
+      - name: Migrate from CNBlogs
+        run:  |
           set -eux
           hexo migrate rss https://www.cnblogs.com/xvsu/rss
 
-      - name:  Commit and push
-        env: 
+      - name: Commit and push
+        env:
           GIT_AUTHOR_NAME: "GitHub Actions"
           GIT_AUTHOR_EMAIL: "actions@github.com"
           GIT_COMMITTER_NAME: "GitHub Actions"
-          GIT_COMMITTER_EMAIL:  "actions@github.com"
+          GIT_COMMITTER_EMAIL: "actions@github.com"
         run: |
-          git add source/_posts  # ✅ 只添加文章
+          # 先拉取远程最新代码，避免冲突
+          git config pull.rebase false
+          git pull origin main --no-edit || true
+          
+          # 添加文章
+          git add source/_posts
+          
+          # 检查是否有变化
           if git diff --quiet --cached; then
             echo "No changes to commit."
           else
             git commit -m "Auto sync from CNBlogs"
-            git push origin HEAD:main  # ✅ 推送到 main 分支
+            git push origin HEAD:main
           fi
