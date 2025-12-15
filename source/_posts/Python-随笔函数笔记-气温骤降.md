@@ -1,5 +1,5 @@
 ---
-title: Python~随笔函数笔记 - 气温骤降
+title: Python-随笔函数笔记 - 气温骤降
 tags:
   - Python
 excerpt: >-
