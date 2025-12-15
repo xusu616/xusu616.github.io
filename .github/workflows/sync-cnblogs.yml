@@ -1,29 +1,29 @@
 name: Sync from CNBlogs
 
-on: 
-  schedule: 
-    - cron: '0 18 * * *'  # 每天凌晨 2 点（UTC 18:00）
-  workflow_dispatch:
-    inputs: 
+on:  
+  schedule:  
+    - cron: '0 18 * * *'  # 每天凌晨 2 点（UTC 18: 00）
+  workflow_dispatch: 
+    inputs:  
       ref:
-        description:  'Branch to sync/build'
+        description:   'Branch to sync/build'
         required: false
         default: 'main'
 
-permissions: 
+permissions:  
   contents: write
 
 jobs: 
-  sync:
+  sync: 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth:  0
           persist-credentials: true
-          submodules:  recursive
+          submodules:   recursive
           ref: ${{ github.event.inputs.ref || 'main' }}
 
       - name: Setup Node.js
@@ -37,18 +37,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name:  Install RSS migrator
+      - name:   Install RSS migrator
         run: npm install hexo-migrator-rss --no-save
 
       - name: Clean old posts (avoid duplicates)
         run: |
           # 删除所有博客园同步的旧文章（通过文件名特征识别）
-          # 这样每次都是全新同步，不会产生重复
-          find source/_posts -name "*-气温骤降*. md" -type f -delete || true
+          # 修复：去掉空格，正确匹配 . md 文件
+          find source/_posts -name "*-气温骤降*.md" -type f -delete || true
           echo "Old posts cleaned"
 
       - name: Migrate from CNBlogs
-        run:  |
+        run:   |
           set -eux
           hexo migrate rss https://www.cnblogs.com/xvsu/rss
 
@@ -57,7 +57,7 @@ jobs:
           GIT_AUTHOR_NAME: "GitHub Actions"
           GIT_AUTHOR_EMAIL: "actions@github.com"
           GIT_COMMITTER_NAME: "GitHub Actions"
-          GIT_COMMITTER_EMAIL: "actions@github.com"
+          GIT_COMMITTER_EMAIL: "actions@github. com"
         run: |
           # 先拉取远程最新代码，避免冲突
           git config pull.rebase false
