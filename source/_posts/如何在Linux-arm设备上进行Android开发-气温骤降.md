@@ -1,5 +1,5 @@
 ---
-title: 如何再Linux arm设备上进行Android开发 - 气温骤降
+title: 如何在Linux arm设备上进行Android开发 - 气温骤降
 tags:
   - Android
 excerpt: >-
