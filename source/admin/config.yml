@@ -2,8 +2,6 @@ backend:
   name: github
   repo: rD227/rD227.github.io
   branch: main
-  base_url: https://rd227.netlify.app  # 改成你的 Netlify OAuth 站点地址
-  site_domain: https://rD227.github.io
 
 media_folder: "source/img"
 public_folder: "/img"
