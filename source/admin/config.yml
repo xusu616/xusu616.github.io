@@ -2,6 +2,7 @@ backend:
   name: github
   repo: rD227/rD227.github.io
   branch: main
+  site_domain: rd227.netlify.app
 
 media_folder: "source/img"
 public_folder: "/img"
