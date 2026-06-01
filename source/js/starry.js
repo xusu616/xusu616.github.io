@@ -15,7 +15,7 @@
     canvas.width = width;
     canvas.height = height;
     starCount = width * 0.216;
-    
+
     stars = [];
     for (var i = 0; i < starCount; i++) {
       var newStar = new Star();
@@ -95,15 +95,21 @@
     return Math.random() * (max - min) + min;
   }
 
+  // 检测暗色模式：主题按钮 或 系统/插件暗色模式
+  function isDarkMode() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ||
+           window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
   var firstRun = true;
   resize();
   firstRun = false;
-  
+
   window.addEventListener("resize", resize, false);
 
   function render() {
     // 仅在暗色模式下绘制
-    if (document.documentElement.getAttribute('data-theme') === 'dark') {
+    if (isDarkMode()) {
       ctx.clearRect(0, 0, width, height);
       for (var i = 0; i < stars.length; i++) {
         stars[i].move();
@@ -114,6 +120,6 @@
     }
     window.requestAnimationFrame(render);
   }
-  
+
   render();
 })();
