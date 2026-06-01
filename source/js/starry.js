@@ -102,11 +102,8 @@
     if (html.getAttribute('data-theme') === 'dark') return true;
     // 系统暗色模式
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
-    // Dark Reader: dataset 属性
-    if (html.dataset.darkreaderMode) return true;
-    if (html.dataset.darkreaderScheme) return true;
-    // Dark Reader: 注入的 style 元素
-    if (document.querySelector('style.darkreader--sync')) return true;
+    // Dark Reader: 仅夜间模式 (scheme=dark)，排除日间模式 (scheme=dimmed)
+    if (html.dataset.darkreaderScheme === 'dark') return true;
     return false;
   }
 

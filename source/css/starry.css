@@ -15,7 +15,7 @@
   opacity: 1;
 }
 
-html[data-darkreader-mode] #universe {
+html[data-darkreader-scheme="dark"] #universe {
   opacity: 1;
 }
 
@@ -43,7 +43,7 @@ html[data-darkreader-mode] #universe {
   animation: floatBg 18s ease-in-out infinite alternate;
 }
 
-html[data-darkreader-mode] .animated-bg {
+html[data-darkreader-scheme="dark"] .animated-bg {
   opacity: 0.6;
   background:
     radial-gradient(600px 300px at 20% 20%, rgba(59,130,246,.12), transparent 60%),
