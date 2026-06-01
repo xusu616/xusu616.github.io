@@ -95,10 +95,11 @@
     return Math.random() * (max - min) + min;
   }
 
-  // 检测暗色模式：主题按钮 或 系统/插件暗色模式
+  // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 等插件
   function isDarkMode() {
     return document.documentElement.getAttribute('data-theme') === 'dark' ||
-           window.matchMedia('(prefers-color-scheme: dark)').matches;
+           window.matchMedia('(prefers-color-scheme: dark)').matches ||
+           document.documentElement.dataset.darkreaderMode;
   }
 
   var firstRun = true;
