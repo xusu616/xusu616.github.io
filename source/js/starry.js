@@ -95,11 +95,19 @@
     return Math.random() * (max - min) + min;
   }
 
-  // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 等插件
+  // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 插件
   function isDarkMode() {
-    return document.documentElement.getAttribute('data-theme') === 'dark' ||
-           window.matchMedia('(prefers-color-scheme: dark)').matches ||
-           document.documentElement.dataset.darkreaderMode;
+    var html = document.documentElement;
+    // Butterfly 主题按钮
+    if (html.getAttribute('data-theme') === 'dark') return true;
+    // 系统暗色模式
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    // Dark Reader: dataset 属性
+    if (html.dataset.darkreaderMode) return true;
+    if (html.dataset.darkreaderScheme) return true;
+    // Dark Reader: 注入的 style 元素
+    if (document.querySelector('style.darkreader--sync')) return true;
+    return false;
   }
 
   var firstRun = true;
@@ -108,8 +116,19 @@
 
   window.addEventListener("resize", resize, false);
 
+  // 监听 html 标签属性变化（Dark Reader 可能在脚本之后才注入属性）
+  var observer = new MutationObserver(function(mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var attr = mutations[i].attributeName;
+      if (attr && attr.startsWith('data-darkreader')) {
+        // 属性变化了，下一帧 render 会自动重新检测
+        return;
+      }
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
   function render() {
-    // 仅在暗色模式下绘制
     if (isDarkMode()) {
       ctx.clearRect(0, 0, width, height);
       for (var i = 0; i < stars.length; i++) {
