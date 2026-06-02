@@ -234,15 +234,21 @@ function generateExcerpt(html, maxLen = 300) {
 function findExistingByUrl(cnblogUrl) {
   if (!fs.existsSync(POSTS_DIR)) return null;
 
+  // 提取 postId 以兼容新旧两种 URL 格式
+  // 旧: https://www.cnblogs.com/xvsu/p/19904407
+  // 新: https://i.cnblogs.com/posts/edit;postId=19904407
+  const postIdMatch = cnblogUrl.match(/\/p\/(\d+)|\/edit;postId=(\d+)/);
+  if (!postIdMatch) return null;
+  const postId = postIdMatch[1] || postIdMatch[2];
+
   const files = fs.readdirSync(POSTS_DIR);
   for (const f of files) {
     if (!f.endsWith(`-${AUTHOR_SUFFIX}.md`)) continue;
     const filepath = path.join(POSTS_DIR, f);
     const content = fs.readFileSync(filepath, 'utf-8');
-    // 只通过 frontmatter 中的 cnblogs_url 字段精确匹配
-    // 避免正文中的交叉引用链接导致误匹配
+    // 按 postId 匹配 frontmatter 中的 cnblogs_url
     const fmMatch = content.match(/^cnblogs_url:\s*(.+)$/m);
-    if (fmMatch && fmMatch[1].trim() === cnblogUrl) {
+    if (fmMatch && fmMatch[1].trim().includes(postId)) {
       return { filename: f, filepath, content };
     }
   }
@@ -396,12 +402,18 @@ function buildHexoPost(item, articleBody) {
     bodyContent = `${excerpt}\n<!-- more -->\n\n${desc}\n\n> 原文地址: [${item.title}](${item.link})`;
   }
 
+  // 将公开链接转为编辑页链接：https://www.cnblogs.com/xvsu/p/19904407 → https://i.cnblogs.com/posts/edit;postId=19904407
+  const postIdMatch = item.link.match(/\/p\/(\d+)/);
+  const editUrl = postIdMatch
+    ? `https://i.cnblogs.com/posts/edit;postId=${postIdMatch[1]}`
+    : item.link;
+
   return `---
 title: ${item.title}
 tags:
 ${tags}
 date: ${dateStr}
-cnblogs_url: ${item.link}
+cnblogs_url: ${editUrl}
 ---
 
 ${bodyContent}

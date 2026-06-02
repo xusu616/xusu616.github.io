@@ -1,10 +1,10 @@
----
+﻿---
 title: Android开发里常用的Kotlin 泛型 配合 高阶函数手记 - 气温骤降
 tags:
   - Kotlin
   - Android
 date: 2026-04-08 01:58:00
-cnblogs_url: https://www.cnblogs.com/xvsu/p/19833801
+cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19833801
 ---
 
 为什么要使用这种东西 声明变量的x作用域，使其更加便于管理 比如这个，很好的例子 fun <T : View> AndroidView( factory: (Context) -> T, // 受影响：必须返回 T modifier: Modifier, // 不受影响：跟 T 没关系 update: (T) -> Unit // 受影响：必须接收 T 作为入参 ) 同样的，还有其他好处，就是比如这个写在第一排的形参 （直接把一个表达式（函数）传进去了还算形参吗？ 这样就可以不用把创建的对象直接传进去 避免在不需要的时候再次创建对象（这是昂贵的 （应该是上一级（或者更底层实现的 fun...
