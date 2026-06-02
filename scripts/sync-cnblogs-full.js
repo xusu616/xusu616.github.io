@@ -120,7 +120,23 @@ function generateFilename(title) {
     filename += '-' + AUTHOR_SUFFIX;
   }
 
-  return filename + '.md';
+  // Linux 文件名最大 255 字节，UTF-8 中文每字 3 字节，需要截断
+  const ext = '.md';
+  const maxBytes = 240; // 留余量
+  if (Buffer.byteLength(filename + ext, 'utf8') > maxBytes) {
+    const suffixIdx = filename.lastIndexOf(AUTHOR_SUFFIX);
+    const suffix = (suffixIdx > 0) ? filename.substring(suffixIdx) : '';
+    const titlePart = (suffixIdx > 0) ? filename.substring(0, suffixIdx - 1) : filename;
+    const suffixBytes = Buffer.byteLength('-' + suffix + ext, 'utf8');
+    let truncated = titlePart;
+    while (Buffer.byteLength(truncated, 'utf8') > maxBytes - suffixBytes) {
+      truncated = truncated.substring(0, truncated.length - 1);
+    }
+    truncated = truncated.replace(/-$/, '');
+    filename = truncated + '-' + suffix;
+  }
+
+  return filename + ext;
 }
 
 /** 发起 HTTP 请求（含重试） */
