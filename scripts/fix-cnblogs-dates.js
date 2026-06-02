@@ -230,7 +230,11 @@ async function main() {
   console.log('═══════════════════════════════════');
 }
 
-main().catch(e => {
-  console.error('❌ 脚本异常:', e);
-  process.exit(1);
-});
+// 仅在直接运行时执行（node scripts/fix-cnblogs-dates.js），Hexo 构建时跳过
+if (require.main === module) {
+  main().catch(e => {
+    console.error('❌ 脚本异常:', e);
+    process.exit(1);
+  });
+}
+module.exports = { main };
