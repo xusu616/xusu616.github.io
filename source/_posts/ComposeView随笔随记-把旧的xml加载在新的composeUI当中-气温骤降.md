@@ -1,10 +1,10 @@
----
+﻿---
 title: ComposeView随笔随记-把旧的xml加载在新的composeUI当中 - 气温骤降
 tags:
   - Kotlin
   - Android
 date: 2026-03-29 15:09:00
-cnblogs_url: https://www.cnblogs.com/xvsu/p/19792386
+cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19792386
 ---
 
 在composeUI当中来预览 简单示例 @Preview @Composable fun OldStyFragmentUIPreview() { AndroidView( factory = { context -> LayoutInflater.from(context/*传入到这里*/).inflate(R.layout.preferences, null/*上一级元素*/) }, modifier = Modifier.fillMaxSize()//变大变高 ) } 此外，还有update选项可以加入 update = { view -> // 这里可以对 View...

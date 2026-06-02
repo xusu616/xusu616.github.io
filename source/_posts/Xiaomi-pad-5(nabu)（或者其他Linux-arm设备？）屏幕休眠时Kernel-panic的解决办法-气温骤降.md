@@ -1,11 +1,11 @@
----
+﻿---
 title: Xiaomi pad 5(nabu)（或者其他Linux arm设备？）屏幕休眠时Kernel panic的解决办法 - 气温骤降
 tags:
   - 刷机
   - Android架构和安全
   - Android
 date: 2026-03-24 07:12:00
-cnblogs_url: https://www.cnblogs.com/xvsu/p/19764162
+cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19764162
 ---
 
 现象： 休眠后会自动关机 修复 排除 journalctl -b -1 -p 3 -n 233 -b -1：查看上一次启动（即崩溃前）的记录 -p 3：只看Error级别以上的日志 -n 9178：看上次多少条 点击查看崩溃日志 [xvsu@alarm ~]$ journalctl -b -1 -p 3 -n 50 Mar 23 12:04:10 alarm kernel: [NVT-ts-spi] nvt_check_fw_reset_state 537: error, retry=11, buf[1]=0x00> Mar 23 12:04:10 alarm kernel:...
