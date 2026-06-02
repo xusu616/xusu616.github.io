@@ -37,18 +37,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install RSS migrator
-        run: npm install hexo-migrator-rss --no-save
-
-      - name: Clean old posts (avoid duplicates)
-        run: |
-          find source/_posts -name "*-气温骤降*.md" -type f -delete || true
-          echo "Old posts cleaned"
-
-      - name:  Migrate from CNBlogs
-        run: |
-          set -eux
-          hexo migrate rss https://www.cnblogs.com/xvsu/rss
+      - name: Sync full articles from CNBlogs
+        run: node scripts/sync-cnblogs-full.js
 
       - name:  Commit and push
         env:
