@@ -12,9 +12,11 @@ const path = require('path');
 
 // ============ 配置 ============
 const POSTS_DIR = path.resolve(__dirname, '..', 'source', '_posts');
-const USER_AGENT = 'Hexo-CNBlogs-DateFix/1.0';
+const DEBUG_DIR = path.resolve(__dirname, '..', 'debug_html'); // 保存失败页面的 HTML 用于调试
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const REQUEST_DELAY = 600; // 请求间隔（毫秒）
 const DRY_RUN = false;     // true: 仅预览，不实际修改文件
+const DEBUG = false;       // true: 保存失败页面的 HTML 到 debug_html/ 目录
 
 // ============ 工具函数 ============
 
@@ -50,13 +52,25 @@ function sleep(ms) {
 function extractPublishDate(html) {
   let pubDate = '';
 
-  // 方法1：从 ld+json 结构化数据中提取（博客园标准格式）
-  const dateMatch = html.match(/"datePublished":\s*"([^"]+)"/);
-  if (dateMatch) {
-    pubDate = dateMatch[1];
+  // 方法1：从 window.currentPostDateAdded 提取（博客园页面 JS 变量，最干净）
+  // 格式: window.currentPostDateAdded = '2026-04-08 09:58'
+  const jsDateMatch = html.match(/window\.currentPostDateAdded\s*=\s*'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})'/);
+  if (jsDateMatch) {
+    pubDate = jsDateMatch[1]; // "2026-04-08 09:58"（中国本地时间）
   }
 
-  // 方法2：从 posted @ 行提取
+  // 方法2：从 ld+json 提取（需要解码 HTML 实体如 &#x2B; → +）
+  if (!pubDate) {
+    const ldMatch = html.match(/"datePublished":\s*"([^"]+)"/);
+    if (ldMatch) {
+      // 解码 HTML 实体：&#x2B; → + , &amp; → &
+      pubDate = ldMatch[1]
+        .replace(/&#x2B;/gi, '+')
+        .replace(/&amp;/g, '&');
+    }
+  }
+
+  // 方法3：从 posted @ 行提取
   if (!pubDate) {
     const postDateMatch = html.match(/posted\s*@\s*(\d{4}-\d{2}-\d{2}\s*\d{2}:\d{2})/);
     if (postDateMatch) {
@@ -64,7 +78,7 @@ function extractPublishDate(html) {
     }
   }
 
-  // 方法3：从 <time> 标签的 datetime 属性提取
+  // 方法4：从 <time> 标签的 datetime 属性提取
   if (!pubDate) {
     const timeMatch = html.match(/<time[^>]*datetime\s*=\s*"([^"]+)"/i);
     if (timeMatch) {
@@ -72,7 +86,7 @@ function extractPublishDate(html) {
     }
   }
 
-  // 方法4：从 Open Graph / meta 标签提取
+  // 方法5：从 meta 标签提取
   if (!pubDate) {
     const ogMatch = html.match(/<meta[^>]*property\s*=\s*"article:published_time"[^>]*content\s*=\s*"([^"]+)"/i)
       || html.match(/<meta[^>]*content\s*=\s*"([^"]+)"[^>]*property\s*=\s*"article:published_time"/i);
@@ -81,17 +95,7 @@ function extractPublishDate(html) {
     }
   }
 
-  // 方法5：从常见的日期 class 元素中提取（博客园旧版格式）
-  if (!pubDate) {
-    const spanMatch = html.match(/class\s*=\s*"[^"]*post-meta[^"]*"[^>]*>[\s\S]*?(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/i)
-      || html.match(/class\s*=\s*"[^"]*post-date[^"]*"[^>]*>[\s\S]*?(\d{4}-\d{2}-\d{2})/i)
-      || html.match(/class\s*=\s*"[^"]*day[^"]*"[^>]*>[\s\S]*?(\d{4}-\d{2}-\d{2})/i);
-    if (spanMatch) {
-      pubDate = spanMatch[1];
-    }
-  }
-
-  // 方法6：最宽松的匹配 — 页面中任意 ISO 8601 日期时间
+  // 方法6：页面中任意 ISO 8601 日期时间（兜底）
   if (!pubDate) {
     const isoMatch = html.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (isoMatch) {
@@ -101,7 +105,7 @@ function extractPublishDate(html) {
 
   if (!pubDate) return null;
 
-  // 使用与 scrape-old-cnblogs.js 完全相同的转换逻辑
+  // 与 scrape-old-cnblogs.js 相同的转换逻辑：new Date() → toISOString() (UTC)
   const d = new Date(pubDate);
   if (isNaN(d.getTime())) return null;
 
@@ -178,6 +182,15 @@ async function main() {
     // 2b. 提取日期（返回 frontmatter 格式的 UTC 日期字符串）
     const correctDateStr = extractPublishDate(html);
     if (!correctDateStr) {
+      // DEBUG: 保存失败的 HTML 到文件，方便分析
+      if (DEBUG) {
+        if (!fs.existsSync(DEBUG_DIR)) fs.mkdirSync(DEBUG_DIR, { recursive: true });
+        const debugFile = path.join(DEBUG_DIR, `debug-${post.postId}.html`);
+        // 只保存前面一段（包含 head/meta），不需要完整 HTML
+        const headPart = html.substring(0, Math.min(html.length, 8000));
+        fs.writeFileSync(debugFile, headPart, 'utf-8');
+        console.log(`       🔍 DEBUG: HTML 前 8000 字符已保存到 ${debugFile}`);
+      }
       console.log(`       ❌ 无法提取发布日期\n`);
       failed++;
       continue;
