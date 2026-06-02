@@ -9,17 +9,6 @@
   var starColor = "30,144,255";
   var cometColor = "226,225,224";
 
-  // 缓存暗色模式检测结果，避免每帧重复计算
-  var darkMode = false;
-  function updateDarkMode() {
-    var html = document.documentElement;
-    darkMode = !!(
-      html.getAttribute('data-theme') === 'dark' ||
-      window.matchMedia('(prefers-color-scheme: dark)').matches ||
-      html.dataset.darkreaderScheme === 'dark'
-    );
-  }
-
   function resize() {
     width = window.innerWidth;
     height = window.innerHeight;
@@ -112,33 +101,26 @@
     return Math.random() * (max - min) + min;
   }
 
+  // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 插件
+  function isDarkMode() {
+    var html = document.documentElement;
+    // Butterfly 主题按钮
+    if (html.getAttribute('data-theme') === 'dark') return true;
+    // 系统暗色模式
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    // Dark Reader: 仅夜间模式 (scheme=dark)，排除日间模式 (scheme=dimmed)
+    if (html.dataset.darkreaderScheme === 'dark') return true;
+    return false;
+  }
+
   var firstRun = true;
-  updateDarkMode();
   resize();
   firstRun = false;
 
-  window.addEventListener("resize", function() {
-    resize();
-    updateDarkMode();
-  }, false);
-
-  // 监听暗色模式切换（主题按钮 / Dark Reader）
-  var observer = new MutationObserver(function(mutations) {
-    for (var i = 0; i < mutations.length; i++) {
-      var attr = mutations[i].attributeName;
-      if (attr === 'data-theme' || (attr && attr.startsWith('data-darkreader'))) {
-        updateDarkMode();
-        return;
-      }
-    }
-  });
-  observer.observe(document.documentElement, { attributes: true });
-
-  // 监听系统暗色模式切换
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateDarkMode);
+  window.addEventListener("resize", resize, false);
 
   function render() {
-    if (darkMode) {
+    if (isDarkMode()) {
       ctx.clearRect(0, 0, width, height);
       for (var i = 0; i < stars.length; i++) {
         stars[i].move();
