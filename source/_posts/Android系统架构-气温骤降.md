@@ -2,7 +2,7 @@
 title: Android系统架构 - 气温骤降
 tags:
   - Android架构和安全
-date: 2026-06-02 16:07:33
+date: 2025-12-15 16:34:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19354857
 ---
 

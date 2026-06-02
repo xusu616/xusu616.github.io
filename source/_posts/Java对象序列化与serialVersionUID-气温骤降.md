@@ -2,7 +2,7 @@
 title: Java对象序列化与serialVersionUID - 气温骤降
 tags:
   - java
-date: 2026-06-02 16:07:35
+date: 2025-12-14 14:41:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19350081
 ---
 

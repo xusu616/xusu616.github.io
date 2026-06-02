@@ -3,7 +3,7 @@ title: C如何使用XOR运算 古法制作链表（异或链表） - 气温骤�
 tags:
   - C&amp;cpp
   - 算法
-date: 2026-06-02 16:07:27
+date: 2026-02-01 15:29:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19561794
 ---
 
