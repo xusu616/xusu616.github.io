@@ -14,7 +14,7 @@
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
-    starCount = width * 0.16;
+    starCount = Math.log( width ) * 19; 
 
     stars = [];
     for (var i = 0; i < starCount; i++) {
@@ -27,7 +27,7 @@
   function Star() {
     this.reset = function() {
       this.giant = getProbability(3);
-      this.comet = this.giant || firstRun ? false : getProbability(10);
+      this.comet = this.giant || firstRun ? false : getProbability(30);
       this.x = getRand(0, width - 10);
       this.y = getRand(0, height);
       this.r = getRand(1.1, 2.6);
