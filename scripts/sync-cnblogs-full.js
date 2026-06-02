@@ -420,8 +420,11 @@ ${bodyContent}
 `;
 }
 
-// 运行
-main().catch(e => {
-  console.error('❌ 脚本异常:', e);
-  process.exit(1);
-});
+// 仅在直接运行时执行（node scripts/sync-cnblogs-full.js），Hexo 构建时跳过
+if (require.main === module) {
+  main().catch(e => {
+    console.error('❌ 脚本异常:', e);
+    process.exit(1);
+  });
+}
+module.exports = { main };
