@@ -14,7 +14,7 @@
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
-    starCount = Math.log( width ) * 19; 
+    starCount = Math.log( width ) * 10; 
 
     stars = [];
     for (var i = 0; i < starCount; i++) {
