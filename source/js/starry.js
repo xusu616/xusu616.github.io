@@ -31,13 +31,13 @@
       this.x = getRand(0, width - 10);
       this.y = getRand(0, height);
       this.r = getRand(1.1, 2.6);
-      this.dx = getRand(0.12, 0.55) + (this.comet ? 3 : 0);
-      this.dy = -getRand(0.12, 0.55) - (this.comet ? 3 : 0);
+      this.dx = getRand(0.05, 0.3) + (this.comet ? 3 : 0);
+      this.dy = -getRand(0.05, 0.3) - (this.comet ? 3 : 0);
       this.fadingOut = null;
       this.fadingIn = true;
       this.opacity = 0;
       this.opacityTresh = getRand(0.2, 1 - (this.comet ? 0.4 : 0));
-      this.do = getRand(0.001, 0.003) + (this.comet ? 0.002 : 0);
+      this.do = getRand(0.0005, 0.002) + (this.comet ? 0.002 : 0);
     };
     this.fadeIn = function() {
       if (this.fadingIn) {
