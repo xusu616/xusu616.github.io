@@ -29,8 +29,8 @@
       this.giant = getProbability(3);
       this.comet = this.giant || firstRun ? false : getProbability(20);
       this.r = getRand(1.1, 2.6);
-      this.dx = getRand(0.06, 0.1) + (this.comet ? 2 : 0);
-      this.dy = -getRand(0.06, 0.1) - (this.comet ? 2 : 0);
+      this.dx = getRand(0.06, 0.1) + (this.comet ? 3 : 0);
+      this.dy = -getRand(0.06, 0.1) - (this.comet ? 3 : 0);
       this.opacityTresh = getRand(0.2, 1 - (this.comet ? 0.4 : 0));
       this.do = getRand(0.0005, 0.002) + (this.comet ? 0.001 : 0);
       // 闪烁参数：每颗星星独立的频率和相位
