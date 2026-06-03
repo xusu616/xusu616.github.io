@@ -14,7 +14,7 @@
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
-    starCount = Math.log( width ) * 10; 
+    starCount = Math.log( width ) * 10;
 
     stars = [];
     for (var i = 0; i < starCount; i++) {
@@ -27,17 +27,40 @@
   function Star() {
     this.reset = function() {
       this.giant = getProbability(3);
-      this.comet = this.giant || firstRun ? false : getProbability(30);
-      this.x = getRand(0, width - 10);
-      this.y = getRand(0, height);
+      this.comet = this.giant || firstRun ? false : getProbability(20);
       this.r = getRand(1.1, 2.6);
-      this.dx = getRand(0.12, 0.55) + (this.comet ? 3 : 0);
-      this.dy = -getRand(0.12, 0.55) - (this.comet ? 3 : 0);
-      this.fadingOut = null;
-      this.fadingIn = true;
-      this.opacity = 0;
+      this.dx = getRand(0.06, 0.1) + (this.comet ? 2 : 0);
+      this.dy = -getRand(0.06, 0.1) - (this.comet ? 2 : 0);
       this.opacityTresh = getRand(0.2, 1 - (this.comet ? 0.4 : 0));
-      this.do = getRand(0.001, 0.003) + (this.comet ? 0.002 : 0);
+      this.do = getRand(0.0005, 0.002) + (this.comet ? 0.001 : 0);
+      // 闪烁参数：每颗星星独立的频率和相位
+      this.twinkleSpeed = getRand(0.03, 0.06);
+      this.twinklePhase = getRand(0, Math.PI * 2);
+
+      // 随机相位：每颗星星出生时处于生命週期的不同阶段，彻底避免同步
+      var phase = Math.random();
+      if (phase < 0.25) {
+        // 刚诞生：渐显中，靠左
+        this.x = getRand(0, width * 0.3);
+        this.y = getRand(0, height);
+        this.opacity = getRand(0, this.opacityTresh * 0.3);
+        this.fadingIn = true;
+        this.fadingOut = null;
+      } else if (phase < 0.85) {
+        // 壮年期：完全可见，屏幕各处巡航
+        this.x = getRand(0, width);
+        this.y = getRand(0, height);
+        this.opacity = this.opacityTresh + getRand(0, 0.3);
+        this.fadingIn = false;
+        this.fadingOut = null;
+      } else {
+        // 暮年期：渐隐中，靠右/靠上，即将 reset
+        this.x = getRand(width * 0.65, width);
+        this.y = getRand(0, height * 0.3);
+        this.opacity = getRand(0, this.opacityTresh);
+        this.fadingIn = false;
+        this.fadingOut = true;
+      }
     };
     this.fadeIn = function() {
       if (this.fadingIn) {
@@ -55,6 +78,18 @@
         }
       }
     };
+    this.twinkle = function() {
+      // 流星不闪烁
+      if (this.comet) return;
+      // 正弦波闪烁 + 微量随机抖动，模拟自然星光
+      this.twinklePhase += this.twinkleSpeed;
+      var flicker = Math.sin(this.twinklePhase) * 0.08 + (Math.random() - 0.5) * 0.015;
+      this.opacity += flicker;
+      // 最低不低于目标透明度的一半，最高不超过 1.3
+      var floor = this.opacityTresh * 0.5;
+      if (this.opacity < floor) this.opacity = floor;
+      if (this.opacity > 1.3) this.opacity = 1.3;
+    };
     this.draw = function() {
       if (this.giant) {
         ctx.beginPath();
@@ -64,7 +99,7 @@
       } else if (this.comet) {
         // 流星：每个尾迹段独立 beginPath/fill，避免路径累积
         // 先画尾迹（从远到近），再画头部
-        for (var i = 17; i >= 0; i--) {
+        for (var i = 0; i < 20; i++) {
           ctx.beginPath();
           ctx.fillStyle = "rgba(" + cometColor + "," + (this.opacity - (this.opacity / 20) * i) + ")";
           ctx.rect(this.x - (this.dx / 4) * i, this.y - (this.dy / 4) * i - 2, 2, 2);
@@ -126,6 +161,7 @@
         stars[i].move();
         stars[i].fadeIn();
         stars[i].fadeOut();
+        stars[i].twinkle();
         stars[i].draw();
       }
     }
