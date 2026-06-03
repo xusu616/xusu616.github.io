@@ -172,11 +172,10 @@ function fixTagsToCategories(fullContent) {
     ? `tags:\n${tagsList.map(t => `  - ${t}`).join('\n')}`
     : 'tags: []';
 
-  // 构建 categories YAML（末尾必须带 \n，因为替换时消耗了标签块末尾的 \n）
+  // 构建 categories YAML（层级展开为缩进列表，不用 bracket 语法）
+  // 末尾必须带 \n，因为替换时消耗了标签块末尾的 \n
   const categoriesYaml = categoriesList.map(parts =>
-    parts.length === 1
-      ? `  - ${parts[0]}`
-      : `  - [${parts.join(', ')}]`
+    parts.map(p => `  - ${p}`).join('\n')
   ).join('\n');
 
   // 重建 frontmatter：

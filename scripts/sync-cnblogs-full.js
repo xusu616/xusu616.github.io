@@ -396,13 +396,11 @@ function buildHexoPost(item, articleBody) {
     ? `tags:\n${tagsList.map(t => `  - ${t}`).join('\n')}`
     : 'tags: []';
 
-  // 构建 categories YAML（仅含层级分类）
+  // 构建 categories YAML（层级分类展开为缩进列表，如 categories:\n  - Parent\n  - Child）
   let categoriesYaml = '';
   if (categoriesList.length > 0) {
     categoriesYaml = '\ncategories:\n' + categoriesList.map(parts =>
-      parts.length === 1
-        ? `  - ${parts[0]}`
-        : `  - [${parts.join(', ')}]`
+      parts.map(p => `  - ${p}`).join('\n')
     ).join('\n');
   }
 
