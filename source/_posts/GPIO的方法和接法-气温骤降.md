@@ -1,9 +1,10 @@
----
+﻿---
 title: GPIO的方法和接法 - 气温骤降
 tags:
   - 数电
   - 嵌入式
-  - 嵌入式 / 数字电路基础
+categories:
+  - [嵌入式, 数字电路基础]
 date: 2025-12-28 08:15:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19412193
 ---

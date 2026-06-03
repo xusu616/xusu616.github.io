@@ -1,8 +1,9 @@
----
+﻿---
 title: 高雅人士如何清理手机qq文件 - 气温骤降
 tags:
   - 刷机
-  - Android架构和安全 / 刷机
+categories:
+  - [Android架构和安全, 刷机]
 date: 2026-02-23 09:01:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19631449
 ---

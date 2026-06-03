@@ -1,8 +1,9 @@
----
+﻿---
 title: 给所有OPPO R7(t)及其子型号刷机的教程和资源及mtkclient和SP flash tool冲突1013解决（包括R7f R7 R7splus R7c R7sf R7sm R7c 及其所有plus的型号的ROM资源） - 气温骤降
 tags:
   - 刷机
-  - Android架构和安全 / 刷机
+categories:
+  - [Android架构和安全, 刷机]
 date: 2026-02-04 03:24:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19573235
 ---

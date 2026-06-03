@@ -376,10 +376,35 @@ async function main() {
 
 /** 构建 Hexo .md 文件内容 */
 function buildHexoPost(item, articleBody) {
-  // 标签
-  const tags = (item.categories && item.categories.length > 0)
-    ? item.categories.map(c => `  - ${c}`).join('\n')
-    : '  - 未分类';
+  // 拆分标签：含 "/" 的转为层级 categories，不含 "/" 的保留为 tags
+  const allLabels = (item.categories && item.categories.length > 0) ? item.categories : [];
+  const tagsList = [];
+  const categoriesList = [];
+
+  for (const label of allLabels) {
+    if (label.includes('/')) {
+      // cnblogs 层级标签: "Android架构和安全 / 刷机" → [Android架构和安全, 刷机]
+      const parts = label.split('/').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 0) categoriesList.push(parts);
+    } else {
+      tagsList.push(label);
+    }
+  }
+
+  // 构建 tags YAML
+  const tagsYaml = tagsList.length > 0
+    ? `tags:\n${tagsList.map(t => `  - ${t}`).join('\n')}`
+    : 'tags: []';
+
+  // 构建 categories YAML（仅含层级分类）
+  let categoriesYaml = '';
+  if (categoriesList.length > 0) {
+    categoriesYaml = '\ncategories:\n' + categoriesList.map(parts =>
+      parts.length === 1
+        ? `  - ${parts[0]}`
+        : `  - [${parts.join(', ')}]`
+    ).join('\n');
+  }
 
   // 日期
   const date = new Date(item.pubDate);
@@ -410,8 +435,7 @@ function buildHexoPost(item, articleBody) {
 
   return `---
 title: ${item.title}
-tags:
-${tags}
+${tagsYaml}${categoriesYaml}
 date: ${dateStr}
 cnblogs_url: ${editUrl}
 ---

@@ -1,8 +1,10 @@
 /**
- * fix-cnblogs-dates.js — 一次性脚本
+ * fix-cnblogs-dates.js
  *
- * 对于所有有 cnblogs_url 标记的文章，从博客园文章页抓取原始发布日期，
- * 并修正 frontmatter 中的 date 字段。
+ * 对于所有有 cnblogs_url 标记的文章：
+ *   1. 从博客园文章页抓取原始发布日期，修正 frontmatter 中的 date 字段
+ *   2. 将 tags 中含 "/" 的标签（如 "Android架构和安全 / 刷机"）转为
+ *      Hexo 层级 categories: [Android架构和安全, 刷机]
  *
  * 用法: node scripts/fix-cnblogs-dates.js
  */
@@ -124,11 +126,79 @@ function extractCurrentDate(frontmatter) {
   return match ? match[1].trim() : null;
 }
 
+/**
+ * 修正 frontmatter 中的 tags：将含 "/" 的标签转为层级 categories
+ * 例如: "Android架构和安全 / 刷机" → categories: [Android架构和安全, 刷机]
+ * 不含 "/" 的保留为普通 tags
+ */
+function fixTagsToCategories(fullContent) {
+  // 分割 frontmatter（首行必须是 ---）
+  const fmStart = fullContent.indexOf('---\n');
+  if (fmStart !== 0) return fullContent;
+
+  // 找第二个 --- 作为 frontmatter 结束标记
+  const fmEnd = fullContent.indexOf('\n---\n', fmStart + 4);
+  if (fmEnd === -1) return fullContent;
+
+  const frontmatter = fullContent.substring(fmStart + 4, fmEnd + 1); // 不含首尾 ---
+  const afterFm = fullContent.substring(fmEnd + 1);                  // 从 "\n---\n..." 开始
+
+  // 解析现有 tags 块
+  const tagsMatch = frontmatter.match(/^tags:\s*\n((?:^\s{2}-\s.+\n)*)/m);
+  if (!tagsMatch) return fullContent;
+
+  const tagsBlock = tagsMatch[1];
+  const tagLines = tagsBlock.split('\n').filter(l => l.trim().startsWith('- '));
+  const tagsList = [];
+  const categoriesList = [];
+
+  for (const line of tagLines) {
+    const label = line.replace(/^\s{2}-\s/, '').trim();
+    if (!label) continue;
+
+    if (label.includes('/')) {
+      const parts = label.split('/').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 0) categoriesList.push(parts);
+    } else {
+      tagsList.push(label);
+    }
+  }
+
+  // 如果没有需要转换的含 "/" 标签，直接返回
+  if (categoriesList.length === 0) return fullContent;
+
+  // 重建 tags YAML
+  const tagsYaml = tagsList.length > 0
+    ? `tags:\n${tagsList.map(t => `  - ${t}`).join('\n')}`
+    : 'tags: []';
+
+  // 构建 categories YAML（末尾必须带 \n，因为替换时消耗了标签块末尾的 \n）
+  const categoriesYaml = categoriesList.map(parts =>
+    parts.length === 1
+      ? `  - ${parts[0]}`
+      : `  - [${parts.join(', ')}]`
+  ).join('\n');
+
+  // 重建 frontmatter：
+  // 1. 移除已有的 categories 块（防止重复运行）
+  let updatedFm = frontmatter.replace(/\ncategories:\s*\n(?:^\s{2}(?:-\s*\[.*?\]|-\s*.+)\n?)*/mg, '');
+  // 2. 替换 tags 块，末尾补 \n 保证和后续字段分隔
+  updatedFm = updatedFm.replace(
+    /^tags:\s*\n((?:^\s{2}-\s.+\n)*)/m,
+    `${tagsYaml}\n${categoriesYaml.length > 0 ? `categories:\n${categoriesYaml}\n` : ''}`
+  );
+
+  // afterFm 已以 "\n---\n..." 开头，所以直接拼接
+  return `---\n${updatedFm}${afterFm}`;
+}
+
 // ============ 主逻辑 ============
 
 async function main() {
   console.log('╔══════════════════════════════════╗');
-  console.log('║  博客园文章日期修正脚本         ║');
+  console.log('║  博客园文章修正脚本             ║');
+  console.log('║  - 修正日期 (date)              ║');
+  console.log('║  - 标签→分类 (tags→categories)  ║');
   console.log(`║  模式: ${DRY_RUN ? '预览 (DRY RUN)' : '实际修改'}                  ║`);
   console.log('╚══════════════════════════════════╝\n');
 
@@ -153,14 +223,17 @@ async function main() {
   console.log(`📋 找到 ${cnblogsPosts.length} 篇有 cnblogs_url 的文章\n`);
 
   // 2. 逐篇处理
-  let fixed = 0;
-  let skipped = 0;
-  let failed = 0;
+  let dateFixed = 0;
+  let dateSkipped = 0;
+  let dateFailed = 0;
+  let catFixed = 0;
+  let catSkipped = 0;
 
   for (let i = 0; i < cnblogsPosts.length; i++) {
     const post = cnblogsPosts[i];
+    let currentContent = post.content;
     const progress = `[${i + 1}/${cnblogsPosts.length}]`;
-    const currentDate = extractCurrentDate(post.content);
+    const currentDate = extractCurrentDate(currentContent);
     const shortName = post.filename.length > 60
       ? post.filename.substring(0, 57) + '...'
       : post.filename;
@@ -169,52 +242,53 @@ async function main() {
     console.log(`       当前日期: ${currentDate || '未找到'}`);
     console.log(`       postId: ${post.postId}`);
 
-    // 2a. 抓取博客园文章页获取原始日期
+    // ── 2a. 修正日期 ──
     const articleUrl = `https://www.cnblogs.com/xvsu/p/${post.postId}`;
     const html = await fetchWithRetry(articleUrl);
 
     if (!html) {
       console.log(`       ❌ 无法获取文章页面\n`);
-      failed++;
+      dateFailed++;
       continue;
     }
 
-    // 2b. 提取日期（返回 frontmatter 格式的 UTC 日期字符串）
     const correctDateStr = extractPublishDate(html);
     if (!correctDateStr) {
-      // DEBUG: 保存失败的 HTML 到文件，方便分析
-      if (DEBUG) {
-        if (!fs.existsSync(DEBUG_DIR)) fs.mkdirSync(DEBUG_DIR, { recursive: true });
-        const debugFile = path.join(DEBUG_DIR, `debug-${post.postId}.html`);
-        // 只保存前面一段（包含 head/meta），不需要完整 HTML
-        const headPart = html.substring(0, Math.min(html.length, 8000));
-        fs.writeFileSync(debugFile, headPart, 'utf-8');
-        console.log(`       🔍 DEBUG: HTML 前 8000 字符已保存到 ${debugFile}`);
-      }
       console.log(`       ❌ 无法提取发布日期\n`);
-      failed++;
+      dateFailed++;
       continue;
     }
 
     console.log(`       正确日期: ${correctDateStr}`);
 
-    // 2c. 比较并修正
     if (currentDate === correctDateStr) {
-      console.log(`       ✅ 日期已正确，跳过\n`);
-      skipped++;
+      console.log(`       ✅ 日期已正确`);
+      dateSkipped++;
     } else {
-      // 替换 frontmatter 中的 date
-      const newContent = post.content.replace(
+      currentContent = currentContent.replace(
         /^date:\s*.+$/m,
         `date: ${correctDateStr}`
       );
+      console.log(`       ✏ 已修正日期: ${currentDate} → ${correctDateStr}`);
+      dateFixed++;
+    }
 
+    // ── 2b. 修正 tags → categories ──
+    const newContent = fixTagsToCategories(currentContent);
+    if (newContent !== currentContent) {
+      // 检查具体改了哪些 categories
+      const catMatch = newContent.match(/^categories:\s*\n((?:^\s{2}-.+\n?)*)/m);
+      const cats = catMatch ? catMatch[1].trim().split('\n').map(l => l.trim()).join(', ') : '';
       if (!DRY_RUN) {
         fs.writeFileSync(post.filepath, newContent, 'utf-8');
       }
-      console.log(`       ✏ 已修正日期: ${currentDate} → ${correctDateStr}\n`);
-      fixed++;
+      console.log(`       ✏ 已修正 categories: ${cats}`);
+      catFixed++;
+    } else {
+      catSkipped++;
     }
+
+    console.log('');
 
     // 请求间隔
     await sleep(REQUEST_DELAY);
@@ -222,8 +296,9 @@ async function main() {
 
   // 3. 输出汇总
   console.log('═══════════════════════════════════');
-  console.log(`✅ 完成！`);
-  console.log(`   已修正: ${fixed}  已正确: ${skipped}  失败: ${failed}`);
+  console.log('✅ 完成！');
+  console.log(`   日期: 已修正 ${dateFixed}  已正确 ${dateSkipped}  失败 ${dateFailed}`);
+  console.log(`   分类: 已修正 ${catFixed}  无需改 ${catSkipped}`);
   if (DRY_RUN) {
     console.log('   (预览模式，未实际修改文件)');
   }

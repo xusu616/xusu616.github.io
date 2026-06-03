@@ -1,9 +1,10 @@
----
+﻿---
 title: 小米 Pad 5 (nabu) 引导 Linux 的FFU问题（已解决）：固件、ABL 与 FFU 模式 - 气温骤降
 tags:
   - Android架构和安全
   - 刷机
-  - Android架构和安全 / 刷机
+categories:
+  - [Android架构和安全, 刷机]
 date: 2026-01-05 13:38:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19444810
 ---
