@@ -30,14 +30,15 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19333665
 └── ArrayDeque</p>
 <h1 id="选代器与类集">选代器与类集</h1>
 <h2 id="两种多次循环时不同">两种多次循环时不同</h2>
-<pre><code class="language-java">Iterator&lt;String&gt; iterator = list.iterator();
+```java
+Iterator<String> iterator = list.iterator();
 while (iterator.hasNext()) {
     String item = iterator.next();
     if ("B".equals(item)) {
         iterator.remove(); // SAFE
     }
 }
-</code></pre>
+```
 <p>隐式遍历（for循环增强）会自动创建迭代器<br>
 隐式遍历不使用迭代器会 modCount !=  expectedModcount<br>
 ConcurrentModificationtExece<br>

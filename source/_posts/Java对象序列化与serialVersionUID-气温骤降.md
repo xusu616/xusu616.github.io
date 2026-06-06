@@ -27,8 +27,9 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19350081
 <blockquote>
 <p>​自动生成（默认）： 如果不手动定义，JVM 会根据类名、字段、方法签名等信息自动计算一个哈希值。对类进行任何微小改动都会使这个 ID 发生变化。</p>
 </blockquote>
-<pre><code class="language-Java">private static final long serialVersionUID = 1L;
-</code></pre>
+```java
+private static final long serialVersionUID = 1L;
+```
 <blockquote>
 <p>修改时机：当进行重大、不兼容的结构修改时（如重命名或者删除字段），应手动递增 ID，避免数据错乱（消除兼容性</p>
 </blockquote>
@@ -39,15 +40,17 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19350081
 父类的所有字段都会被序列化。</p>
 </blockquote>
 <p>要求覆写两个方法</p>
-<pre><code class="language-Java">private void writeObject(ObjectOutputStream out)
+```java
+private void writeObject(ObjectOutputStream out)
 private void readObject(ObjectInputStream in)
-</code></pre>
+```
 <h2 id="要求有一个空参数的构造函数">要求有一个空参数的构造函数</h2>
 <p><strong>当 Java 虚拟机（JVM）反序列化（即调用 readExternal() 方法来重建对象）一个实现了 Externalizable 的对象时，它首先需要一个对象的实例来调用 readExternal() 方法<br>
 如果还要实例化对应的对象，再写一个让它重载即可</strong></p>
-<pre><code class="language-Java">public Person(){}
+```java
+public Person(){}
 public Person(String name, int age){
     this.name=name;
     this.age=age;
 }
-</code></pre>
+```

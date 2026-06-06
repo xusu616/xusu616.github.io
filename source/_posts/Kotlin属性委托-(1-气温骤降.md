@@ -11,8 +11,9 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19887264
 <!-- more -->
 
 <h1 id="干嘛">干嘛</h1>
-<pre><code class="language-Kotlin">val Context.dataStore: DataStore&lt;Preferences&gt; by preferencesDataStore(name = "settings")
-</code></pre>
+```kotlin
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+```
 <p>属性对应的 get()（与 set()）会被委托给它（后面被委托的那个东西）的 getValue() 与 setValue() 方法</p>
 <h2 id="警告">警告</h2>
 <p>Kotlin 不允许在局部作用域定义这种扩展属性委托，也就是说<br>
@@ -28,7 +29,8 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19887264
 <h2 id="1像上面一样拓展属性">1.像上面一样，拓展属性</h2>
 <h2 id="2委托属性其实还是一个意思">2.委托属性（<s>其实还是一个意思</s>）</h2>
 <h2 id="3懒惰延迟属性">3.懒惰（延迟）属性</h2>
-<pre><code class="language-Kotlin">val lazyValue: String/*缓存属性*/ by lazy {
+```kotlin
+val lazyValue: String/*缓存属性*/ by lazy {
     println("computed!")/*初始化方法*/
     "Hello"
 }
@@ -37,12 +39,13 @@ fun main() {
     println(lazyValue)//输出 computed Hello
     println(lazyValue)//输出 Hello
 }
-</code></pre>
+```
 <h1 id="可观察属性-observable-properties">可观察属性 Observable properties</h1>
 <p>看一下这一段就懂了</p>
-<pre><code class="language-Kotlin">import kotlin.properties.Delegates
+```kotlin
+import kotlin.properties.Delegates
 
-var name: String by Delegates.observable("初始值") { property, oldValue, newValue -&gt;
+var name: String by Delegates.observable("初始值") { property, oldValue, newValue ->
     println("${property.name} 从 '$oldValue' 变成了 '$newValue'")
 }
 
@@ -50,4 +53,4 @@ fun main() {
     name = "Alice"  // 输出: name 从 '初始值' 变成了 'Alice'
     name = "Bob"    // 输出: name 从 'Alice' 变成了 'Bob'
 }
-</code></pre>
+```

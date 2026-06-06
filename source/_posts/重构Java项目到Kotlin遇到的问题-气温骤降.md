@@ -19,18 +19,20 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19737643
 也可以说Java的类默认open，Kotlin默认final</p>
 <h1 id="2错误-方法不会覆盖或实现超类型的方法">2.错误: 方法不会覆盖或实现超类型的方法</h1>
 <p>某些方法不正常，需要open，重写</p>
-<pre><code class="language-Kotlin">    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+```kotlin
+override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         return super.onCreateOptionsMenu(menu)
     }
-</code></pre>
+```
 <h1 id="3-转compose之后放弃了xml放弃了对layout的引用">3. 转Compose之后放弃了xml，放弃了对layout的引用</h1>
 <p>某些ai转换工具会把用不到的东西删掉</p>
-<pre><code class="language-bash">D:\Users\xvsu\AndroidStudioProjects\shizuku-ftp\primitiveFTPd\src\org\primftpd\ui\PftpdFragment.java:775: 错误: 找不到符号
+```bash
+D:\Users\xvsu\AndroidStudioProjects\shizuku-ftp\primitiveFTPd\src\org\primftpd\ui\PftpdFragment.java:775: 错误: 找不到符号
             TabLayout.Tab tab = tabLayout.getTabAt(MainTabsActivity.INDEX_FINGERPRINTS);
                                                                    ^
   符号:   变量 INDEX_FINGERPRINTS
   位置: 类 MainTabsActivity
-&lt;a href="open.plugin.studio.bot"&gt;Explain with AI&lt;/a&gt;
-</code></pre>
+<a href="open.plugin.studio.bot">Explain with AI</a>
+```
 <p>可以先把变量加回去，再慢慢重构，把对应的使用的地方也重写为compose</p>
 <h1 id="4edgetoedge之前那个">4.EdgeToEdge（之前那个</h1>

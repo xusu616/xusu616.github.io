@@ -17,8 +17,9 @@ IDEA查找层级结构 将光标指向类，按住ctrl + H，即可查找父类 
 <p>按住 alt + F7 可以查找子类 | 用法<br>
 按住 ctrl + Q 可以查找快速文档（介绍</p>
 <h1 id="kotlin-类级转换">kotlin 类级转换</h1>
-<pre><code class="language-Kotlin">val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
-</code></pre>
+```kotlin
+val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
+```
 <p>使用as?转换（接受子类），无法转换kotlin会自动换为Null，后续再用?.安全调用<br>
 （向上转型<br>
 （向下转型是自动的</p>

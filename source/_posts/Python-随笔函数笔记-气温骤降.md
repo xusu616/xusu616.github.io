@@ -51,29 +51,32 @@ Python的库函数 例如math库函数 **点击看看函数示例** 一些常用
 <p>定义: 使用 lambda 关键字，结构简洁（单行表达式）。</p>
 <p>特点: 没有名称（匿名），结果是单个表达式的值，隐式返回（无需 return）。</p>
 <p>用途: 通常用于作为参数传递给其他高阶函数（如 map, filter, sorted 的 key），处理简单的、一次性的逻辑。</p>
-<pre><code class="language-Python">from math import *
+```python
+from math import *
 f=lambda r: (2*pi)/(1+log(r)) #lambda函数
 n=int(input("Please Input n:"))
 y=exp(2.0)
 for r in range(1,n+1):
     y+=f(r)
 print('y=%.5f'%y)
-</code></pre>
+```
 <p>累加项为 $\frac{2\pi}{1+\ln r}$ <s>博客园预览看不到latex表达式？</s><em>右下角开启</em></p>
 <h2 id="2-普通函数-defined-function">2. 普通函数 (Defined Function)</h2>
 <p>定义: 使用 def 关键字。</p>
 <p>特点: 必须有名称，可以包含多行语句（循环、条件判断等），使用 return 显式返回。</p>
 <p>用途: 适用于处理复杂的、需要多步操作或清晰代码结构的逻辑。</p>
-<pre><code class="language-Python">def add_ten(x):
+```python
+def add_ten(x):
     result = x + 10
     return result
-</code></pre>
+```
 <h1 id="3其他复杂操作">3.其他复杂操作</h1>
 <h2 id="结合-map-和-filter-进行数据处理链式操作">结合 map 和 filter 进行数据处理链式操作</h2>
 <p>这个场景常用于数据清洗和转换。lambda 函数在这里作为处理逻辑的“插头”，<strong>传入一个匿名函数</strong>,定义了数据的处理规则。</p>
-<pre><code class="language-Python">data_list = [1, 5, -2, 10, 8, 3, -7, 20]
-positive_numbers = list(filter(lambda x: x &gt; 0, data_list))
-</code></pre>
+```python
+data_list = [1, 5, -2, 10, 8, 3, -7, 20]
+positive_numbers = list(filter(lambda x: x > 0, data_list))
+```
 <p><strong>filter返回一个迭代器，需要给他转成一个列表</strong><br>
 list() 函数是一个消费者。<strong>它不断地向迭代器索要下一个元素，直到迭代器耗尽为止</strong>。每得到一个元素，list() 就把它加入到它正在构建的新列表中。</p>
 <blockquote>
@@ -93,14 +96,16 @@ sorted() 是 Python 的内置函数，它的主要作用是对任何可迭代对
 </ol>
 <p>输入: 可以是任何可迭代对象（在这个例子中，输入是一个列表 students）。</p>
 <p>输出: 总是一个新的列表。</p>
-<pre><code class="language-Python"># 验证 sorted_students 的类型
+```python
+# 验证 sorted_students 的类型
 print(type(sorted_students))
-# 输出: &lt;class 'list'&gt;
-</code></pre>
+# 输出: <class 'list'>
+```
 <ol start="2">
 <li>列表元素的类型</li>
 </ol>
-<pre><code class="language-Python">#贴一段作演示
+```python
+#贴一段作演示
 # 数据：(姓名, 年龄, 分数)
 students = [
     ('Alice', 25, 90),
@@ -128,7 +133,7 @@ for student in sorted_students:
 # ('Alice', 25, 90)  # 90分中年龄小的
 # ('Bob', 30, 90)    # 90分中年龄大的
 # ('Charlie', 25, 85)
-</code></pre>
+```
 <p><strong>sort()对列表元组集合排序后 就 返回列表</strong><br>
 <em>虽然 sorted_students 是一个列表，但它内部的元素类型保持不变。</em></p>
 <p><em>在原始数据中，students 列表的每个元素都是一个元组 (姓名, 年龄, 分数)。sorted() 函数只</em>是移动和排列这些元组，它不会改变这些元组本身的数据类型。*</p>

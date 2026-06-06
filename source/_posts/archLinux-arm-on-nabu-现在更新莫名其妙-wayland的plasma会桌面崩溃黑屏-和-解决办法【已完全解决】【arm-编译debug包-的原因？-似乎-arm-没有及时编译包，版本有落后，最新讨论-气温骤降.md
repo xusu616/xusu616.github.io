@@ -59,8 +59,9 @@ Doing a full system reboot</p>
 <h2 id="临时解决方案">临时解决方案</h2>
 <p>切换到X11 session。</p>
 <p>在SDDM登录界面左下角选<code>Plasma (X11)</code>就行。如果没有这个选项，装一下：</p>
-<pre><code class="language-bash">sudo pacman -S plasma-x11-session
-</code></pre>
+```bash
+sudo pacman -S plasma-x11-session
+```
 <p>X11下一切正常，就是拖窗口没Wayland丝滑</p>
 <h2 id="其他问题">其他问题：</h2>
 <p><strong>0x0.st挂了</strong>：这个常用来上传日志的粘贴站，因为AI bot垃圾上传太多，已经禁用文件上传了。可以用<code>https://paste.rs</code>代替。</p>
