@@ -31,14 +31,16 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19965932
 <p><strong>问题</strong>：Android激活时发出的是HTTPS请求，HTTP代理对系统级连通性检测（<code>connectivitycheck.gstatic.com</code>）不一定生效，即使手机可以用这个方法，平板的DerpFest版本仍然报告无法连接互联网。</p>
 <h3 id="adb直接写入settings">ADB直接写入settings</h3>
 <p>通常的绕过方法：</p>
-<pre><code class="language-bash">adb shell settings put global device\_provisioned 1
+```bash
+adb shell settings put global device\_provisioned 1
 adb shell settings put secure user\_setup\_complete 1
-</code></pre>
+```
 <p><strong>问题</strong>：系统首次启动前ADB默认关闭，进入系统后才有ADB权限，形成死锁。</p>
 <h3 id="recovery里执行settings命令">Recovery里执行settings命令</h3>
 <p>进入PitchBlack Recovery后ADB可用，但：</p>
-<pre><code>/system/bin/sh: settings: inaccessible or not found
-</code></pre>
+```
+/system/bin/sh: settings: inaccessible or not found
+```
 <p>settings命令依赖<code>cmd</code>，而<code>cmd</code>依赖<code>libandroid\_runtime.so</code>等完整Android运行时库，在recovery环境里这些库不存在，无法执行。</p>
 <h3 id="挂载其他分区修改文件">挂载其他分区修改文件</h3>
 <p>Recovery里尝试挂载product、system_ext分区寻找SetupWizard APK并删除，但：</p>
@@ -53,34 +55,40 @@ adb shell settings put secure user\_setup\_complete 1
 <p>---</p>
 <h2 id="关键发现settings文件是abx二进制格式">关键发现：settings文件是ABX二进制格式</h2>
 <p>Android将settings存储在：</p>
-<pre><code>/data/system/users/0/settings\_global.xml
+```
+/data/system/users/0/settings\_global.xml
 /data/system/users/0/settings\_secure.xml
-</code></pre>
+```
 <p>虽然扩展名是<code>.xml</code>，实际是**ABX（Android Binary XML）**格式，无法用普通文本编辑器或sed修改。</p>
 <p>用<code>grep</code>可以确认：</p>
-<pre><code class="language-bash">grep -i "device\_provisioned" /data/system/users/0/settings\_global.xml
+```bash
+grep -i "device\_provisioned" /data/system/users/0/settings\_global.xml
 # 输出：Binary file matches
-</code></pre>
+```
 <p>---</p>
 <h2 id="解决方案python-patch-abx文件">解决方案：Python patch ABX文件</h2>
 <h3 id="第一步把文件pull到电脑">第一步：把文件pull到电脑</h3>
-<pre><code class="language-bash">adb pull /data/system/users/0/settings\_global.xml C:\\Desktop\\settings\_global.bin
+```bash
+adb pull /data/system/users/0/settings\_global.xml C:\\Desktop\\settings\_global.bin
 adb pull /data/system/users/0/settings\_secure.xml C:\\Desktop\\settings\_secure.bin
-</code></pre>
+```
 <h3 id="第二步分析二进制结构">第二步：分析二进制结构</h3>
-<pre><code class="language-python">f = open(r'C:\\Desktop\\settings\_global.bin', 'rb')
+```python
+f = open(r'C:\\Desktop\\settings\_global.bin', 'rb')
 d = f.read()
 f.close()
 
 idx = d.find(b'device\_provisioned')
 print('context:', d\[idx:idx+40])
-</code></pre>
+```
 <p>输出：</p>
-<pre><code>context: b'device\_provisioned/\\x00\\x05\\x00\\x010/\\x00\\x06\\x00\\x07android/\\x00\\x07\\x00'
-</code></pre>
+```
+context: b'device\_provisioned/\\x00\\x05\\x00\\x010/\\x00\\x06\\x00\\x07android/\\x00\\x07\\x00'
+```
 <p>可以看到<code>device\_provisioned</code>的值<code>0</code>紧跟在固定的字节序列<code>/\\x00\\x05\\x00\\x01</code>之后，直接替换这个字节即可。</p>
 <h3 id="第三步patch-settings_globalxmldevice_provisioned">第三步：patch settings_global.xml（device_provisioned）</h3>
-<pre><code class="language-python">f = open(r'C:\\Desktop\\settings\_global.bin', 'rb')
+```python
+f = open(r'C:\\Desktop\\settings\_global.bin', 'rb')
 d = bytearray(f.read())
 f.close()
 
@@ -88,16 +96,17 @@ target  = b'device\_provisioned/\\x00\\x05\\x00\\x010'
 replace = b'device\_provisioned/\\x00\\x05\\x00\\x011'
 
 pos = d.find(target)
-if pos &gt;= 0:
+if pos >= 0:
     d\[pos:pos+len(target)] = replace
     print('patched!')
 
 f = open(r'C:\\Desktop\\settings\_global\_patched.bin', 'wb')
 f.write(d)
 f.close()
-</code></pre>
+```
 <h3 id="第四步patch-settings_securexmluser_setup_complete">第四步：patch settings_secure.xml（user_setup_complete）</h3>
-<pre><code class="language-python">f = open(r'C:\\Desktop\\settings\_secure.bin', 'rb')
+```python
+f = open(r'C:\\Desktop\\settings\_secure.bin', 'rb')
 d = bytearray(f.read())
 f.close()
 
@@ -105,21 +114,23 @@ target  = b'user\_setup\_complete/\\x00\\x05\\x00\\x010'
 replace = b'user\_setup\_complete/\\x00\\x05\\x00\\x011'
 
 pos = d.find(target)
-if pos &gt;= 0:
+if pos >= 0:
     d\[pos:pos+len(target)] = replace
     print('patched!')
 
 f = open(r'C:\\Desktop\\settings\_secure\_patched.bin', 'wb')
 f.write(d)
 f.close()
-</code></pre>
+```
 <h3 id="第五步push回设备">第五步：push回设备</h3>
-<pre><code class="language-bash">adb push C:\\Desktop\\settings\_global\_patched.bin /data/system/users/0/settings\_global.xml
+```bash
+adb push C:\\Desktop\\settings\_global\_patched.bin /data/system/users/0/settings\_global.xml
 adb push C:\\Desktop\\settings\_secure\_patched.bin /data/system/users/0/settings\_secure.xml
-</code></pre>
+```
 <h3 id="第六步重启">第六步：重启</h3>
-<pre><code class="language-bash">adb reboot
-</code></pre>
+```bash
+adb reboot
+```
 <p>重启后直接进入桌面，Setup Wizard不再出现。</p>
 <p>---</p>
 <h2 id="注意事项">注意事项</h2>

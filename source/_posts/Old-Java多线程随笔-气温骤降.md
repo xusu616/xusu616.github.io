@@ -15,16 +15,18 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19335065
 <p>无返回值</p>
 <p>不能抛出受检异常</p>
 <p>只有：</p>
-<pre><code class="language-Java">void run();
-</code></pre>
+```java
+void run();
+```
 <hr>
 <h2 id="future">Future</h2>
 <p>接口：表示异步任务的结果</p>
 <p>常用方法：</p>
-<pre><code class="language-Java">V get();         // 阻塞等待获取结果
+```java
+V get();         // 阻塞等待获取结果
 boolean cancel();
 boolean isDone();
-</code></pre>
+```
 <hr>
 <h2 id="futuretask">FutureTask</h2>
 <p>类</p>
@@ -53,18 +55,18 @@ t.start()<br>
 ▼<br>
 ft.get()  // 获取 call() 的返回值</p>
 <p>示例：Callable 有返回值</p>
-<pre><code class="language-Java">Callable&lt;Integer&gt; task = () -&gt; {
+```java
+Callable<Integer> task = () -> {
     // do something...
     return 42;
 };
 
-FutureTask&lt;Integer&gt; futureTask = new FutureTask&lt;&gt;(task);
+FutureTask<Integer> futureTask = new FutureTask<>(task);
 new Thread(futureTask).start();
 
 Integer result = futureTask.get();
 System.out.println(result);  // 42
-
-</code></pre>
+```
 <hr>
 <h1 id="3-runnable--thread-执行流程">3. Runnable → Thread 执行流程</h1>
 <p>执行链条</p>
@@ -77,9 +79,10 @@ t.start()<br>
 ▼<br>
 obj.run()</p>
 <p>示例：Runnable 无返回值</p>
-<pre><code class="language-Java">Runnable r = () -&gt; System.out.println("Running...");
+```java
+Runnable r = () -> System.out.println("Running...");
 new Thread(r).start();
-</code></pre>
+```
 <hr>
 <h1 id="4-线程的生命周期thread-life-cycle">4. 线程的生命周期（Thread Life Cycle）</h1>
 <p>┌──────────────┐<br>

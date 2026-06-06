@@ -25,6 +25,7 @@ PS:应该有替换的办法让Android studio能在arm设备上面使用，未知
 下载后，解压，放在对应的文件夹<br>
 编译构建时要给它指定此aapt2的路径<br>
 加入gradle.properties中</p>
-<pre><code class="language-properties">android.aapt2FromMavenOverride=/YOUR_ANDROID_SDK_PATH/build-tools/aapt2
-</code></pre>
+```properties
+android.aapt2FromMavenOverride=/YOUR_ANDROID_SDK_PATH/build-tools/aapt2
+```
 <p>顺带一提AGP似乎最高只支持8.12.0（目前（比正常电脑慢一点</p>

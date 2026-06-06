@@ -20,7 +20,8 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19489540
 https://www.bilibili.com/video/BV1gu2DBGEpT/
 <details>
 <summary>防止懒得去下方的GitHub仓库看别人的源码，你可以点这里查看它</summary>
-<pre><code class="language-C">#define SYS_write 1
+```c
+#define SYS_write 1
 #define SYS_nanosleep 35 
 #define SYS_exit 60
 
@@ -76,7 +77,7 @@ int parse_int(const char *raw_int) {
     int result = 0;
     const char *cursor = raw_int;
 
-    while (*cursor &gt;= '0' &amp;&amp; *cursor &lt;= '9') {
+    while (*cursor >= '0' && *cursor <= '9') {
         result = result * 10 + (*cursor - '0');
         cursor++;
     }
@@ -105,7 +106,7 @@ void sleep(long seconds) {
     timespec duration = {0};
     duration.tv_sec = seconds;
 
-    syscall2(SYS_nanosleep, (long)(&amp;duration), 0);
+    syscall2(SYS_nanosleep, (long)(&duration), 0);
 }
 
 
@@ -152,7 +153,7 @@ __attribute__((naked)) void _start() {
 #1. ifdef __cplusplus
 }
 #endif
-</code></pre>
+```
 </details>
 <h2 id="11-asm__volatile__mov-rsp-0--rrsp">1.1 asm__volatile__("mov %%rsp, %0" : "=r"(rsp));</h2>
 <h2 id="12-long-rsp-强制类型转换">1.2 (long *)rsp (强制类型转换)：</h2>
@@ -160,8 +161,9 @@ __attribute__((naked)) void _start() {
 <p>编译器不知道这个数字代表什么<br>
 再用*解引用</p>
 <p>总的来说，就是通过数值到地址，再用这个地址来修改值</p>
-<pre><code class="language-C">long argc =*(long *) rsp
-</code></pre>
+```c
+long argc =*(long *) rsp
+```
 <h2 id="13-对argv的操作">1.3 对argv的操作</h2>
 <p>我们通过+8来越过栈顶，到达argv[0]<br>
 argv[0]：存储当前执行程序的名称<br>
@@ -184,9 +186,10 @@ argv[2] = "123"</p>
 就是说，C语言对底层的抽象做不到<br>
 所以我们必须用asm__volatile__（大部分时间是这个函数</p>
 <p>但是汇编可以</p>
-<pre><code>mov 其他地方, rsp
+```
+mov 其他地方, rsp
 把地址拷贝到其他地方
-</code></pre>
+```
 <h1 id="3-编译器把rsp指向开辟的垃圾区域导致出问题">3. 编译器把rsp指向开辟的垃圾区域导致出问题</h1>
 <p>进入 _start 时，栈顶本来存的是 argc。但编译器为了管理函数局部变量，先执行了 push 和 sub（管理内存，使用修饰词让编译器不要乱加之后，需要自己重写这些函数）</p>
 <p>所以项目使用__attribute__((naked))修饰函数，相当于让编译器不要干任何多余的事情</p>

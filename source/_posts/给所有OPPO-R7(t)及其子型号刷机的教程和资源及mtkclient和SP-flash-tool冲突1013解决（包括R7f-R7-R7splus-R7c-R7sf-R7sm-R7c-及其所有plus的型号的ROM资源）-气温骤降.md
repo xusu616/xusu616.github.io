@@ -26,21 +26,22 @@ R7t(联发科)可长按音量上键和关机键，熄屏立刻松开关机，关
 <h1 id="4然后请不要更新coloros否则会跳rec重启">4.然后请不要更新colorOS，否则会跳REC重启</h1>
 <h1 id="5针对r7t解释其他手机我没有">5.针对R7(t)解释，其他手机我没有。。。</h1>
 <h1 id="6可以使用adb-getprop确认我在rec里面跑的">6.可以使用adb getprop确认（我在REC里面跑的）</h1>
-<pre><code>PS C:\Users\xvsu\Desktop&gt; adb devices
+```
+PS C:\Users\xvsu\Desktop> adb devices
 
 List of devices attached
 
 SKIZJBU8YHJV7SSS        device
 
-PS C:\Users\xvsu\Desktop&gt; adb shell getprop ro.product.model
+PS C:\Users\xvsu\Desktop> adb shell getprop ro.product.model
 
 OPPO R7
 
-PS C:\Users\xvsu\Desktop&gt; adb shell getprop ro.build.product
+PS C:\Users\xvsu\Desktop> adb shell getprop ro.build.product
 
 oppo6752_15011
 #显然是联发科芯片mtk6752
-</code></pre>
+```
 <h1 id="资源">资源</h1>
 <p>在萤火虫资源站复活之前，可以直接看萤火虫的123pan<br>
 <a href="https://www.123pan.com/s/lod3vd-9OKqd" target="_blank" rel="noopener nofollow">https://www.123pan.com/s/lod3vd-9OKqd</a><br>

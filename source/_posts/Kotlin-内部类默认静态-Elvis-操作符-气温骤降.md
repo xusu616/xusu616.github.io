@@ -23,9 +23,10 @@ Kotlin 内部类 默认静态内部类 在 Kotlin 中，你直接在一个类里
 <p><em>如果内部类在跑耗时任务，外部 Activity 关了也跑不掉，内存直接炸</em></p>
 <p>特权： 它可以随意访问外部类的所有私有变量。</p>
 <p>调用麻烦</p>
-<pre><code class="language-Kotlin">val o = Outer()
+```kotlin
+val o = Outer()
 o.Inner()
-</code></pre>
+```
 <p>实际上，这种拓展功能的东西，应该用接口写</p>
 <h1 id="elvis-操作符-">Elvis 操作符 (?:&nbsp;)</h1>
 <p><sub>这个操作符的名字来源于它的形状像猫王</sub> ~(Elvis Presley~ <s>听起来像榴莲</s> <sub>的侧脸发型</sub></p>

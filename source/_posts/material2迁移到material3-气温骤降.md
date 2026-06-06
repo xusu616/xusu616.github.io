@@ -87,12 +87,14 @@ Compose Material Ripple  构成材料涟漪	androidx.compose.material:material-r
 -&gt;<br>
 implementation "androidx.compose.material3:material3:$m3-version"</p>
 <h2 id="更换颜色">更换颜色</h2>
-<pre><code class="language-Kotlin">import androidx.compose.material3.lightColorScheme
+```kotlin
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
-</code></pre>
+```
 <p>调用这两个方法lightColorScheme( darkColorScheme(<br>
 可以这样把变量写外面</p>
-<pre><code class="language-Kotlin">val AppLightColorScheme = lightColorScheme(
+```kotlin
+val AppLightColorScheme = lightColorScheme(
     // M3 light Color parameters
 )
 val AppDarkColorScheme = darkColorScheme(
@@ -103,7 +105,7 @@ val AppColorScheme = if (darkTheme) {
 } else {
     AppLightColorScheme
 }
-</code></pre>
+```
 <h2 id="注意要更换导航栏sidemenu也需要修改">注意要更换导航栏，sideMenu也需要修改</h2>
 <blockquote>
 <p>M2 Scaffold 中的所有 drawer* 参数都已从 M3 Scaffold 中移除。其中包括 drawerShape 和 drawerContent 等参数。如需使用 M3 Scaffold 显示抽屉式导航栏，请改用抽屉式导航栏可组合项（如 ModalNavigationDrawer）</p>

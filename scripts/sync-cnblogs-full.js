@@ -192,9 +192,9 @@ function extractArticleBody(html) {
   return content ? normalizeContent(content) : null;
 }
 
-/** 规范化文章内容：修复相对 URL、清理空白 */
+/** 规范化文章内容：修复相对 URL、HTML 代码块转 markdown fence、清理空白 */
 function normalizeContent(content) {
-  // 将相对路径的图片/链接转为绝对路径
+  // 1. 将相对路径的图片/链接转为绝对路径
   content = content.replace(
     /(src|href)="(\/[^"]+)"/g,
     (_, attr, relativeUrl) => {
@@ -202,6 +202,30 @@ function normalizeContent(content) {
         return `${attr}="https:${relativeUrl}"`;
       }
       return `${attr}="https://www.cnblogs.com${relativeUrl}"`;
+    }
+  );
+
+  // 2. 博客园 HTML 代码块 → markdown fenced code block
+  //    这样 Hexo 渲染器才能正确高亮，Butterfly 主题才会显示语言标签和复制按钮
+  content = content.replace(
+    /<pre><code(?:\s+class="([^"]*)")?>([\s\S]*?)<\/code><\/pre>/g,
+    (_, className, code) => {
+      // 提取语言: "language-kotlin" → "kotlin"
+      let lang = '';
+      if (className) {
+        const langMatch = className.match(/language-(\w+)/i);
+        if (langMatch) lang = langMatch[1].toLowerCase();
+      }
+
+      // 解码 HTML 实体（博客园对代码块内容做了 HTML 转义）
+      const decoded = code
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+
+      return `\`\`\`${lang}\n${decoded.trim()}\n\`\`\``;
     }
   );
 

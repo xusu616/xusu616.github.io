@@ -28,66 +28,71 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19561794
 <em>指针不能直接异或运算</em>，我们可以使用结构体包含值 <em>（uintptr_t类型)</em>，然后辅助运算</p>
 <h1 id="如下倒着看一遍">如下，倒着看一遍</h1>
 <p>比如要先存入数据，就要维护一个当前值和一个prev值，在链表为空的时候，需要CreateNode函数创建节点再处理维护begin和end，不为空就可以正常异或赋值传值</p>
-<pre><code class="language-C">Node* CreateNode(int value) {
+```c
+Node* CreateNode(int value) {
     Node* node = (Node*)calloc(1, sizeof(Node));
-    node-&gt;value = value;
-    node-&gt;xorn = 0;
+    node->value = value;
+    node->xorn = 0;
     return node;
 }
 void ll_append(XORLinkedList* ll,int value){
-    if(ll-&gt;begin == NULL){
-        assert(ll-&gt;end == NULL);
+    if(ll->begin == NULL){
+        assert(ll->end == NULL);
         Node *node = CreateNode(value);
-        ll-&gt;begin = node;
-        ll-&gt;end = node;
+        ll->begin = node;
+        ll->end = node;
         return;
     }
     Node *node = CreateNode(value);
-    ll-&gt;end-&gt;xorn ^= (uintptr_t)node;
-    node-&gt;xorn = (uintptr_t)ll-&gt;end;
-    ll-&gt;end = node;
+    ll->end->xorn ^= (uintptr_t)node;
+    node->xorn = (uintptr_t)ll->end;
+    ll->end = node;
 }
-</code></pre>
+```
 <p>遍历时需要维护prev</p>
-<pre><code class="language-C">Node* NodeNext(Node* node,uintptr_t * prev ){
-    Node *next = (Node*)(node-&gt;xorn ^ *prev);
+```c
+Node* NodeNext(Node* node,uintptr_t * prev ){
+    Node *next = (Node*)(node->xorn ^ *prev);
     //Node *next = (Node* )((Node*).xorn ^ (Node*)prev);
     *prev = (uintptr_t)node;
     return next;
 }
-</code></pre>
+```
 <p>然后就</p>
-<pre><code class="language-C">    for(Node* iter = eg.begin; iter != NULL;iter = NodeNext(iter, &amp;prev)) {
-        printf("%d ", iter-&gt;value);
+```c
+for(Node* iter = eg.begin; iter != NULL;iter = NodeNext(iter, &prev)) {
+        printf("%d ", iter->value);
     }
-</code></pre>
+```
 <p>ll_append 0~9<br>
 输出0 1 2 3 4 5 6 7 8 9<br>
 其实还是看一遍源码更有用（）<br>
 删除尾部（不然就遍历再把节点接上）</p>
-<pre><code class="language-C">void ll_detach_end(XORLinkedList* ll){
-    if (ll-&gt;end == NULL){
-        assert(ll-&gt;begin == NULL);
+```c
+void ll_detach_end(XORLinkedList* ll){
+    if (ll->end == NULL){
+        assert(ll->begin == NULL);
         return;
     }
     
-    if (ll-&gt;begin == ll-&gt;end) {//Only one node
-        free(ll-&gt;end);
-        ll-&gt;begin = NULL;
-        ll-&gt;end = NULL;
+    if (ll->begin == ll->end) {//Only one node
+        free(ll->end);
+        ll->begin = NULL;
+        ll->end = NULL;
         return;
     }
-    Node* old_end = ll-&gt;end;
-    Node* new_end = (Node*)(old_end-&gt;xorn); // old_end 的前一个节点的地址转换为节点指针
-    //NULL&lt;-&gt;...&lt;-&gt;new_end&lt;-&gt;old_end&lt;-&gt;NULL
+    Node* old_end = ll->end;
+    Node* new_end = (Node*)(old_end->xorn); // old_end 的前一个节点的地址转换为节点指针
+    //NULL<->...<->new_end<->old_end<->NULL
     //                           ↑xorn of it ==addresses of new_end ^ NULL
 
-    new_end-&gt;xorn ^= (uintptr_t)old_end;  // 异或掉 old_end
+    new_end->xorn ^= (uintptr_t)old_end;  // 异或掉 old_end
     
-    ll-&gt;end = new_end;
+    ll->end = new_end;
     free(old_end);
 }
-</code></pre>
+```
 <p>删除特定节点</p>
-<pre><code class="language-C">
-</code></pre>
+```c
+
+```

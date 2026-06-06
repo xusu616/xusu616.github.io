@@ -17,7 +17,8 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19345249
 ---&gt;&gt;图片、音频、视频、压缩包、二进制文件</p>
 <details>
 <summary>点我看看代码</summary>
-<pre><code class="language-Java">import java.io.*;
+```java
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -30,8 +31,7 @@ public class Main {
         fis.close();
     }
 }
-
-</code></pre>
+```
 </details>
 <blockquote>
 <p>read() 一次读 1 个字节<br>
@@ -46,7 +46,8 @@ public class Main {
 ---&gt;&gt;文本文件（.txt / .java / .md）</p>
 <details>
 <summary>点我看看代码示例</summary>
-<pre><code class="language-Java">import java.io.*;
+```java
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -59,8 +60,7 @@ public class Main {
         fr.close();
     }
 }
-
-</code></pre>
+```
 </details>
 <h1 id="操作过程">操作过程</h1>
 <ol>
@@ -71,14 +71,16 @@ public class Main {
 <strong>不会自动把堆上这个对象关掉</strong></li>
 </ol>
 <h2 id="可以用try-with-resources">可以用try-with-resources</h2>
-<pre><code class="language-Java">try (FileInputStream fis = new FileInputStream("a.txt")) {
+```java
+try (FileInputStream fis = new FileInputStream("a.txt")) {
     //使用，关闭
 }
-</code></pre>
+```
 <h2 id="以后真正要用的是bufferedreader这里随便贴一段代码吧">以后真正要用的是BufferedReader<s>这里随便贴一段代码吧</s></h2>
 <details>
 <summary>点击查看代码</summary>
-<pre><code class="language-Java">import java.io.*;
+```java
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -105,26 +107,27 @@ public class Main {
         bw.close();
     }
 }
-
-</code></pre>
+```
 </details>
 <details>
 <summary>点我看看想法  **和Callable的关系**</summary>
 <h3 id="就像futuretask-来接受callable实例">就像FutureTask 来接受Callable实例？</h3>
 <p>哦我调查了一下，应该不太一样<br>
 BufferedReader：装饰器模式</p>
-<pre><code class="language-Java">public class BufferedReader extends Reader {
+```java
+public class BufferedReader extends Reader {
     protected Reader in;
 }
-</code></pre>
+```
 <p>它本身还是一个 Reader<br>
 只是 内部持有另一个 Reader</p>
 <p><strong>FutureTask：任务适配 + 状态机</strong><br>
 FutureTask 的关系是：<br>
 Callable<v>  → 提供计算逻辑<br>
 FutureTask<v> → 管理执行、状态、结果</v></v></p>
-<pre><code class="language-Java">FutureTask&lt;V&gt; implements RunnableFuture&lt;V&gt;
-</code></pre>
+```java
+FutureTask<V> implements RunnableFuture<V>
+```
 <blockquote>
 <p><strong>BufferedReader 是“能力增强型包装”，</strong><br>
 <strong>FutureTask 是“执行语义转换型包装”</strong></p>

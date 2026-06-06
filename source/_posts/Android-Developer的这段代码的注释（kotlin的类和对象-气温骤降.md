@@ -15,7 +15,8 @@ cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19735555
 <p>这段代码感觉很清晰，可以理一下，看项目<sub>应该</sub>会看得更懂（？</p>
 </blockquote>
 <p><img src="https://img2024.cnblogs.com/blog/3673875/202603/3673875-20260318200947705-48821173.png" alt="image" loading="lazy"></p>
-<pre><code>package com.github.rd227.helloworld
+```
+package com.github.rd227.helloworld
 
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -144,17 +145,17 @@ class RangeRegulator(
     initialValue: Int,
     private val minValue: Int,
     private val maxValue: Int
-) : ReadWriteProperty&lt;Any?, Int&gt; {
+) : ReadWriteProperty<Any?, Int> {
 
     var fieldData = initialValue
 
-    override fun getValue(thisRef: Any?, property: KProperty&lt;*&gt;): Int {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): Int {
         return fieldData// property 可以获取属性的元数据（名字、类型等）//这里没用到
     }
 /*
 *
 *
-*    override fun setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: Int) {
+*    override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
         if (value in minValue..maxValue) {
             fieldData = value
         } else {
@@ -167,7 +168,7 @@ class RangeRegulator(
 *
 *
 */
-    override fun setValue(thisRef: Any?, property: KProperty&lt;*&gt;, value: Int) {
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
         if (value in minValue..maxValue) {
             fieldData = value// property 可以获取属性的元数据（名字、类型等）
         }
@@ -181,6 +182,6 @@ fun main() {
     smartDevice = SmartLightDevice("Google Light", "Utility")
     smartDevice.turnOn()
 }
-</code></pre>
+```
 <p>1.反射<br>
 2.类的继承调用</p>
