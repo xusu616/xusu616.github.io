@@ -69,4 +69,7 @@ function main() {
   console.log(`   修改文件: ${totalFixed}  转换代码块: ${totalBlocks}`);
 }
 
-main();
+// 仅在直接运行时执行（node scripts/fix-code-blocks.js），Hexo 构建时跳过
+if (require.main === module) {
+  main();
+}
