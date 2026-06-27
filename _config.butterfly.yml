@@ -47,7 +47,7 @@ code_blocks:
 #   icon: link || the description || color
 social:
   fab fa-github: https://github.com/rD227 || Github || '#24292e'
-  fab fa-blog: https://www.cnblogs.com/xvsu || 博客园 || '#0066cc'
+  fas fa-blog: https://www.cnblogs.com/xvsu || 博客园 || '#0066cc'
 
 # --------------------------------------
 # Image Settings
