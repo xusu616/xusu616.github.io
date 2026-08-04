@@ -88,3 +88,27 @@ excerpt: 感觉到一种方法，可以一层一层地看Kotlin，比如请求�
 
   上面的示例不是正文的，而是更合理架构的后者
 
+  **如果是前者的话，会出现一个我们都不想要的现象就是，主函数好好的ui，甚至是调用传入了 modifier的surface的ui相关的地方 都会突然有一层不相干的权限请求**
+
+就像这样(就比较拉)
+
+```Kotlin
+
+Surface(
+    modifier = Modifier.fillMaxSize(),
+    color = MaterialTheme.colorScheme.background 
+){
+    McuLinkApp(onRequestPermission = {
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        arrayOf(Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH_ADVERTISE
+        )
+    } else {
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+    permissionLauncher.launch(permissions)            
+}) 
+}
+
+```
