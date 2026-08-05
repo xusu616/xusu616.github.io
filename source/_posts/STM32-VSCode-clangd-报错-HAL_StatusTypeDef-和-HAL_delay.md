@@ -1,5 +1,6 @@
 ---
 title: STM32 + VSCode clangd 误报 HAL_StatusTypeDef，以及 HAL_delay 这种真错误
+date: 2026-08-04 12:00:00
 tags:
   - 嵌入式
   - STM32
