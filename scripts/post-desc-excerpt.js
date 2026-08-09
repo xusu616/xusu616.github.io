@@ -1,36 +1,14 @@
 'use strict'
 
-// Override Butterfly theme's postDesc helper to support the `excerpt` frontmatter field.
-// Theme loads first, site scripts load second — this re-registration takes priority.
+// Copy `excerpt` → `description` before each post renders, so Butterfly theme's
+// existing postDesc helper picks it up.  No theme files are touched.
+//
+// This runs automatically when you `hexo generate` or `hexo server`.
+// Restart Hexo after adding this file.
 
-const { stripHTML, truncate } = require('hexo-util')
-
-const truncateContent = (content, length, encrypt = false) => {
-  if (!content || encrypt) return ''
-  return truncate(stripHTML(content).replace(/\n/g, ' '), { length })
-}
-
-hexo.extend.helper.register('postDesc', data => {
-  const { description, excerpt, content, postDesc, encrypt } = data
-
-  if (postDesc) return postDesc
-
-  const { length, method } = hexo.theme.config.index_post_content
-
-  if (method === false) return
-
-  let result
-  switch (method) {
-    case 1:
-      result = description || excerpt
-      break
-    case 2:
-      result = description || excerpt || truncateContent(content, length, encrypt)
-      break
-    default:
-      result = excerpt || truncateContent(content, length, encrypt)
+hexo.extend.filter.register('before_post_render', data => {
+  if (data.excerpt && !data.description) {
+    data.description = data.excerpt
   }
-
-  data.postDesc = result
-  return result
+  return data
 })
