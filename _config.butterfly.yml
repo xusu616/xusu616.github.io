@@ -1099,16 +1099,82 @@ inject:
         .card-author-button-group .blog-btn:hover {
           background: #0052a3;
         }
+
+        /* 白天模式下代码块字体加深（默认） */
+        :root {
+          --hl-color: #1a1a1a;
+        }
+        figure.highlight code {
+          color: #1a1a1a;
+        }
+
+        /* 深色代码块模式（通过 .dark-code 类触发） */
+        body.dark-code figure.highlight {
+          background: #1e1e1e !important;
+          color: #d4d4d4 !important;
+        }
+        body.dark-code figure.highlight pre,
+        body.dark-code figure.highlight code {
+          background: #1e1e1e !important;
+          color: #d4d4d4 !important;
+        }
+        body.dark-code figure.highlight .line::before {
+          color: #858585 !important;
+        }
+        body.dark-code figure.highlight .hljs-keyword { color: #569cd6 !important; }
+        body.dark-code figure.highlight .hljs-string { color: #ce9178 !important; }
+        body.dark-code figure.highlight .hljs-comment { color: #6a9955 !important; }
+        body.dark-code figure.highlight .hljs-number { color: #b5cea8 !important; }
+        body.dark-code figure.highlight .hljs-function { color: #dcdcaa !important; }
+        body.dark-code figure.highlight .hljs-variable { color: #9cdcfe !important; }
+
+        /* 深色代码块按钮样式 */
+        #darkcode {
+          display: none;
+        }
+        #rightside-config-hide #darkcode {
+          display: block;
+        }
       </style>
     - |
       <script>
         document.addEventListener('DOMContentLoaded', function() {
+          // 添加卡片按钮组
           var cardInfo = document.querySelector('.card-info');
           if (cardInfo) {
             var group = document.createElement('div');
             group.className = 'card-author-button-group';
             group.innerHTML = '<a href="https://github.com/rD227" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub</a><a href="https://www.cnblogs.com/xvsu" target="_blank" class="blog-btn"><i class="fas fa-blog"></i> 博客园</a>';
             cardInfo.appendChild(group);
+          }
+
+          // 添加深色代码块切换按钮
+          var rightsideHide = document.getElementById('rightside-config-hide');
+          if (rightsideHide) {
+            var darkCodeBtn = document.createElement('button');
+            darkCodeBtn.id = 'darkcode';
+            darkCodeBtn.type = 'button';
+            darkCodeBtn.title = '深色代码块';
+            darkCodeBtn.innerHTML = '<i class="fas fa-code"></i>';
+            rightsideHide.appendChild(darkCodeBtn);
+
+            // 读取保存的状态
+            var savedMode = localStorage.getItem('dark-code-mode');
+            if (savedMode === 'dark') {
+              document.body.classList.add('dark-code');
+            }
+
+            // 点击切换
+            darkCodeBtn.addEventListener('click', function() {
+              document.body.classList.toggle('dark-code');
+              var isDark = document.body.classList.contains('dark-code');
+              localStorage.setItem('dark-code-mode', isDark ? 'dark' : 'light');
+
+              // 显示提示（如果启用了 Snackbar）
+              if (window.btf && window.btf.snackbarShow) {
+                btf.snackbarShow(isDark ? '代码块已切换为深色模式' : '代码块已切换为浅色模式');
+              }
+            });
           }
         });
       </script>
