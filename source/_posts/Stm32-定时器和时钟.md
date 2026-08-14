@@ -41,6 +41,4 @@ apb1 连接 tim2 3 4 apb2 连接 tim1 和所有的gpio 口
 
 再通过 Trigger Source 选择一条路径即可（此时仍然可以选择ETR1）
 
-![alt text](\img\image.png)
-
-![alt text](image-1.png)
+![alt text](/img/image.png)
