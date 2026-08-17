@@ -45,6 +45,9 @@ lua:vim.keymap.set({'n', 'v'}, '<C-c>', '"+y', { desc = '复制到系统剪贴�
 
 # 安装
 
+先构建
+然后打开
+
 ```Bash
 sudo docker rm -f deepseek-dsh
 
