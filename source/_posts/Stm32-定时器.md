@@ -83,7 +83,7 @@ while(1){
 ```C
 /*USER CODE BEGIN O*/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-    if//.....
+    if (htim == &htim2)
     //这里可以开启中断串口，蓝牙中断串口也行。。来发送消息
 }
 
