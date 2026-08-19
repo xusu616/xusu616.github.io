@@ -4,6 +4,8 @@ tags:
   - Android
 date: 2026-04-27 04:40:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19936396
+categories:
+    - Android
 ---
 
 提供两个网址 https://shapeshifter.design/ https://beta.shapeshifter.design/ 用于动态AnimatedVectorDrawable (AVD)编辑 pathData变换 https://www.cnblogs.com/guanxinjing/p/12810662.html 这篇文章写了很多 本文只写一点Android端的使用和注意 pathData 在 Android 设备里面和预览的里面状况可能不一样 为了优化，Android会在动画还没开始，AVD 也会渲染 path_1 的初始状态 path_1: M 302.983...

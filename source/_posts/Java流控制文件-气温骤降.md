@@ -4,6 +4,8 @@ tags:
   - java
 date: 2025-12-13 03:44:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19345249
+categories:
+    - Java
 ---
 
 字节流 和 字符流 字节流（Byte Stream） 单位：字节（8 bit） 适用情况：不关心字符编码 适合： --->>图片、音频、视频、压缩包、二进制文件 点我看看代码 import java.io.*; public class Main { public static void main(String[] args) throws Exception { FileInputStream fis = new FileInputStream("test.txt"); //构造重载自动找路径，不需要File f = new File(路径) int b; while ((b =...

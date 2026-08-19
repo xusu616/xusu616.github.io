@@ -6,6 +6,8 @@ tags:
   - Android开发
 date: 2026-03-18 10:41:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19735404
+categories:
+    - Kotlin
 ---
 
 辅助构造函数 语法如下 // 1. 父类：必须标记为 open 才能被继承 open class SmartDevice(val name: String, val category: String) { var deviceStatus = "Unknown" init { println("父类主构造函数：正在初始化 $name") } // 父类的辅助构造函数：处理带状态码的情况 constructor(name: String, category: String, statusCode: Int) : this(name, category) {//使用this...

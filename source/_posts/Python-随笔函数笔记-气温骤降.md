@@ -4,6 +4,8 @@ tags:
   - Python
 date: 2025-12-15 04:33:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19351827
+categories:
+    - Python
 ---
 
 Python的库函数 例如math库函数 **点击看看函数示例** 一些常用的方法 数学符号 Python 函数/常量 描述 $\ln x$ math.log(x) 自然对数（以 $e$ 为底）。这是计算 $\ln$ 的标准方法。 $e^x$ math.exp(x) 计算 $e$ 的 $x$ 次方。例如：math.exp(2) 用于计算 $e^2$。 $\pi$ math.pi 圆周率 $\pi$ 的常数值。 $\log_b x$ math.log(x, b) 计算以任意底数 $b$ 为底的对数。 lambda && def 1. 匿名函数 (Lambda Function) 定义:...

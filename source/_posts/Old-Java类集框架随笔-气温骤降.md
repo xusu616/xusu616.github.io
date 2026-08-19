@@ -4,6 +4,8 @@ tags:
   - java
 date: 2025-12-10 16:09:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19333665
+categories:
+    - Java
 ---
 
 结构 Map ├── HashMap │ └── LinkedHashMap ├── SortedMap (接口) │ └── TreeMap └── Hashtable (遗留类，线程安全) Collection ├── List（ListIterator可用） │ ├── ArrayList │ ├── LinkedList │ ├── Vector │ │ └── Stack ├── Set │ ├── HashSet │ │ └── LinkedHashSet │ └── TreeSet └── Deque (通常由 ArrayDeque 实现) └── ArrayDeque...

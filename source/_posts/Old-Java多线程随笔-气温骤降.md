@@ -4,6 +4,8 @@ tags:
   - java
 date: 2025-12-11 03:05:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19335065
+categories:
+    - Java
 ---
 
 1. Runnable / Future / FutureTask 关系 Runnable 接口 无返回值 不能抛出受检异常 只有： void run(); Future 接口：表示异步任务的结果 常用方法： V get(); // 阻塞等待获取结果 boolean cancel(); boolean isDone(); FutureTask 类 同时实现 Runnable + Future 作用：把一个 Callable 或 Runnable 包装成可提交给线程或线程池执行的任务 结构关系如下： Callable │ ▼ FutureTask <── implements ──...
