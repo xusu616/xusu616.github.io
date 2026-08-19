@@ -5,6 +5,8 @@ tags:
   - Android
 date: 2026-05-02 02:52:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19965932
+categories:
+    - Linux
 ---
 
 背景 刷入第三方ROM（如DerpFest）后，首次开机会进入Google激活向导（Setup Wizard）。如果网络无法连接Google服务器，系统会卡在"正在准备您的平板电脑 / 无法连接到互联网"界面，无法进入桌面。 常规解决思路（连VPN、设置WiFi代理）在激活界面操作受限，加上data分区加密，导致大多数ADB绕过方法失效。 本文记录一种通过直接patch ABX二进制设置文件来绕过激活的方法 环境 设备：小米平板5（nabu） ROM：DerpFest Android 16 + arch arm Recovery：PitchBlack...

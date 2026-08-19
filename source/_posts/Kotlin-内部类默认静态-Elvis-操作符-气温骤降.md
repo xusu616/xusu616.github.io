@@ -5,6 +5,8 @@ tags:
   - Android
 date: 2026-04-21 16:29:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19904407
+categories:
+    - Kotlin
 ---
 
 Kotlin 内部类 默认静态内部类 在 Kotlin 中，你直接在一个类里写另一个类，它默认就是静态的。 它不持有外部类的引用 调用方便： * 外部调用： Outer.Inner()。直接 new（当然kotlin没有这个关键字），不需要先创建外部类对象 它拿不到外部类的 this（实例变量），只能访问外部类的静态成员（companion object 里的东西） 不完全是静态的，加了@JvmStatic才会生成一样的静态的字节码 而且都这样了，为什么不直接写外面，非要写个内部类 非静态内部类 (需加 inner 关键字) 它会持有一个指向外部类的引用（this@Outer）...

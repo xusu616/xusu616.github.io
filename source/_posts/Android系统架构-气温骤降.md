@@ -4,6 +4,8 @@ tags:
   - Android架构和安全
 date: 2025-12-15 16:34:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19354857
+categories:
+    - Android
 ---
 
 没办法基础的东西还是要写一下的 Android架构及拓展图 贴一张官网上修改过后的图片（我会尽量精简内容 其实就是懒得写 总结 我自己写似乎不大好看，直接让ai帮我总结制表了，放前面方便比对看看 建议开电脑看 模块 交互对象 交互方式 稳定性 解释 Android Framework (AOSP/保护) HAL Implementation (Vendor) Binder IPC (橙色) 稳定 上层框架通过标准的 AIDL 接口，利用 Binder 机制调用 HAL 服务。这是 Android 跨进程、跨边界通信的标准方式。 Android Framework (AOSP/保护)...

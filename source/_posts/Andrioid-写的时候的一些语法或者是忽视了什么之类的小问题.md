@@ -1,6 +1,6 @@
 ---
 title: Andrioid-写的时候的一些语法或者是忽视了什么之类的小问题
-date: 2026-08-18 12:00:00
+date: 2026-08-19 12:00:00
 tags:
   - Android
   - Kotlin

@@ -4,6 +4,8 @@ tags:
   - Android
 date: 2026-04-01 15:49:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19809032
+categories:
+    - Linux
 ---
 
 PS:应该有替换的办法让Android studio能在arm设备上面使用，未知的对compose UI实时渲染和性能表现，你可以去试试！ 我使用的时IDEA的Linux arm版本，但是这样还不够，下面会补充如何让它正常跑起来（当然，对compose实时渲染的支持是没有的 但是，GitHub已经有支持苹果M1（arm架构芯片）的Android studio（unofficial），所以还是很有希望的！ 顺带一提，没有支持arm的NDK开发 下载 嗯，就是下载，下载arm版本的idea 安装 安装后，安装Android插件 在进入一些地方的时候会提示你补全插件应该 补全编译工具...

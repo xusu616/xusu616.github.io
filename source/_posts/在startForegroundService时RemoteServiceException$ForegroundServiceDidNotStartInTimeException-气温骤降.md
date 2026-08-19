@@ -5,6 +5,8 @@ tags:
   - Android
 date: 2026-04-01 15:24:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19808998
+categories:
+    - Android
 ---
 
 日志 Explain: FATAL EXCEPTION: main Process: org.primftpd, PID: 18395 android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{50d0a06 u0 org.primftpd/.services.SshServerService...

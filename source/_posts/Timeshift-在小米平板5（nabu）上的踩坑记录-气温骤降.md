@@ -4,6 +4,8 @@ tags:
   - 刷机
 date: 2026-05-02 03:14:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19965964
+categories:
+    - Linux
 ---
 
 设备：小米平板5（codename: nabu） 系统：Arch Linux ARM，内核 6.14 桌面：KDE Plasma 6（X11） 1 ｜安装时镜像源 404 安装 Timeshift 时遇到 rsync 包下载失败： 错误：无法从 mirrors.tuna.tsinghua.edu.cn 获取文件 'rsync-3.4.1-2-aarch64.pkg.tar.xz' The requested URL returned error: 404 原因：镜像源同步延迟，某个版本的包还没同步过来 ～～（虽然没必要提的，但是arch...
