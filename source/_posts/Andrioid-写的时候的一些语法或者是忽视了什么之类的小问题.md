@@ -1,5 +1,5 @@
 ---
-title: Git 仓库历史断链 broken link 排查 和 意外回退然后 rebase
+title: Andrioid-写的时候的一些语法或者是忽视了什么之类的小问题
 date: 2026-08-18 12:00:00
 tags:
   - Android
