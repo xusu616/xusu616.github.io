@@ -220,11 +220,13 @@ netsh interface portproxy delete v4tov4 listenport=3081 listenaddress=0.0.0.0
 netsh interface portproxy add v4tov4 listenport=3081 listenaddress=0.0.0.0 connectport=3081 connectaddress=<新WSL IP>
 ```
 
-# 为什么用局域网 IP 访问 Web 还会报错
+# 其他问题和允许手机访问
+
+## 为什么用局域网 IP 访问 Web 还会报错
 
 即使端口转发通了，有些 Web 应用还会因为“非 localhost 访问”拒绝敏感接口。
 
-## crypto.randomUUID is not a function
+### 1crypto.randomUUID is not a function
 
 浏览器只在 secure context 下开放 `crypto.randomUUID()`。
 
@@ -233,7 +235,7 @@ netsh interface portproxy add v4tov4 listenport=3081 listenaddress=0.0.0.0 conne
 
 所以局域网 IP 访问时，页面里用到 `crypto.randomUUID()` 的功能会报错。
 
-## HTTP 403
+### 2 HTTP 403
 
 dsh 这类工具还会主动拒绝非 localhost 的 host 级 API，例如：
 
@@ -243,7 +245,7 @@ dsh 这类工具还会主动拒绝非 localhost 的 host 级 API，例如：
 
 这不是端口转发坏了，而是 dsh 在保护本机文件系统。
 
-# 更稳的方案：SSH 隧道
+## 目前在用的允许手机联通的方案：SSH 隧道
 
 如果只是想从手机/另一台电脑访问，又不想直接暴露到局域网，SSH 隧道最合适：
 
@@ -251,7 +253,7 @@ dsh 这类工具还会主动拒绝非 localhost 的 host 级 API，例如：
 ssh -N -L 3081:127.0.0.1:3081 xvsu@192.168.0.100
 ```
 
-然后在手机浏览器访问：
+然后在手机浏览器访问（随便开一个终端比如Termux）：
 
 ```text
 http://127.0.0.1:3081
