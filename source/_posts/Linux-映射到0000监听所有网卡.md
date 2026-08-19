@@ -235,6 +235,22 @@ netsh interface portproxy add v4tov4 listenport=3081 listenaddress=0.0.0.0 conne
 
 所以局域网 IP 访问时，页面里用到 `crypto.randomUUID()` 的功能会报错。
 
+解决办法就是
+
+去chrome或者edge，输入
+
+```address
+chrome://flags/#unsafely-treat-insecure-origin-as-secure
+```
+
+在框框处把你想要白名单的网站加进去
+
+然后点下面，可能有启用之类的选项
+
+我这里是chrome，下面要点已启用
+
+会提示已保存
+
 ### 2 HTTP 403
 
 dsh 这类工具还会主动拒绝非 localhost 的 host 级 API，例如：
@@ -247,21 +263,21 @@ dsh 这类工具还会主动拒绝非 localhost 的 host 级 API，例如：
 
 ## 目前在用的允许手机联通的方案：SSH 隧道
 
-如果只是想从手机/另一台电脑访问，又不想直接暴露到局域网，SSH 隧道最合适：
+如果只是想从手机/另一台电脑访问，又不想直接暴露到局域网，SSH 隧道最合适（（随便开一个终端比如Termux（要安装ssh）：
 
 ```bash
 ssh -N -L 3081:127.0.0.1:3081 xvsu@192.168.0.100
 ```
 
-然后在手机浏览器访问（随便开一个终端比如Termux）：
+然后在手机浏览器访问：
 
 ```text
 http://127.0.0.1:3081
 ```
 
-从应用视角看，请求来自 `localhost`，不会触发 403，也满足 secure context，`crypto.randomUUID` 也能正常工作。
+请求来自 `localhost`，不会触发 403，也满足 secure context，`crypto.randomUUID` 也能正常工作
 
-Termux 里先装 openssh：
+*Termux 里先装 openssh：*
 
 ```plain
 pkg install openssh
@@ -275,6 +291,7 @@ pkg install openssh
 - 程序禁止 `0.0.0.0` 时，用 `socat` 或 Node 代理做本地转发
 - WSL2 还需要 Windows `netsh interface portproxy` 转发到 WSL IP
 - 直接暴露局域网 HTTP 可能触发安全限制 / 浏览器 secure context 问题
-- SSH 隧道是最稳妥、不需要删容器、也能在手机上访问的方式
+- SSH 隧道是不需要删容器 能在手机上访问的方式
 ash
 next dev -H 0.0.0.0 -p 3080
+ssh -N -L 3081:127.0.0.1:3081 hostname@192.168.0.100
