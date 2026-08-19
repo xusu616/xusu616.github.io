@@ -193,6 +193,8 @@ proxy.listen(3081, '0.0.0.0', () => {
 
 # WSL2 里还有一层 NAT
 
+~~主要是我是nat~~
+
 如果你的 Linux 跑在 WSL2 里，就算服务已经监听 `0.0.0.0:3081`，局域网手机仍然访问不到。
 
 因为 WSL2 是 NAT 网络，`0.0.0.0` 只是监听在 WSL 的虚拟网卡上，手机到不了那里。
@@ -277,7 +279,7 @@ http://127.0.0.1:3081
 
 请求来自 `localhost`，不会触发 403，也满足 secure context，`crypto.randomUUID` 也能正常工作
 
-*Termux 里先装 openssh：*
+_Termux 里先装 openssh：_
 
 ```plain
 pkg install openssh
