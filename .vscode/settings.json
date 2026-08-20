@@ -1,7 +1,8 @@
 {
-  "pasteImage.path": "${projectRoot}/source/img/",
-  "pasteImage.prefix": "/img/",
-  "pasteImage.basePath": "/img/",
-  "pasteImage.defaultName": "pasted-image-${timestamp}",
-  "pasteImage.defaultExtension": ".png"
+  "pasteImage.path": "${projectRoot}/source/img",
+  "pasteImage.basePath": "${projectRoot}/source",
+  "pasteImage.prefix": "/",
+  "pasteImage.forceUnixStyleSeparator": true,
+  "pasteImage.defaultName": "pasted-image-YYYY-MM-DD-HH-mm-ss",
+  "pasteImage.insertPattern": "![${imageFileNameWithoutExt}](${imageFilePath})"
 }
