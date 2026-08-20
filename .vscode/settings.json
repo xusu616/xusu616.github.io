@@ -1,5 +1,7 @@
 {
   "pasteImage.path": "${projectRoot}/source/img/",
-  "pasteImage.basePath": "${projectRoot}/source/",
-  "pasteImage.prefix": "/"
+  "pasteImage.prefix": "/img/",
+  "pasteImage.basePath": "/img/",
+  "pasteImage.defaultName": "pasted-image-${timestamp}",
+  "pasteImage.defaultExtension": ".png"
 }

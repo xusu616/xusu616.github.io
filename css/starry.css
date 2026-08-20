@@ -189,6 +189,10 @@
   height: auto;
   display: block;
   margin: 0 auto;
+  background-color: transparent !important;
+  fill: initial !important;
+  stroke: initial !important;
+
 }
 .pixel-cat-state {
   display: none;
@@ -224,4 +228,9 @@
   .px-chew {
     opacity: 0;
   }
+}
+
+/* Keep Pixel Cat from being inverted by Dark Reader's filter mode. */
+html[data-darkreader-mode="filter"] .pixel-cat-svg {
+  filter: invert(100%) hue-rotate(180deg) !important;
 }
