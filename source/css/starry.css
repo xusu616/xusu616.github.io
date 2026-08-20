@@ -253,3 +253,8 @@ html[data-darkreader-scheme="dark"] .animated-bg {
     opacity: 0;
   }
 }
+
+/* Keep Pixel Cat from being inverted by Dark Reader's filter mode. */
+html[data-darkreader-mode="filter"] .pixel-cat-svg {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
