@@ -53,4 +53,4 @@ Navigater 看起来是一个抽象类，那怎么能把它直接拿来用呢
 点到Navigater的声明就能看到
 
 
-![alt text](image.png)
+![navClass](My-Blog/source/_posts/2026-08-20-13-12-25.png)
