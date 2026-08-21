@@ -1,12 +1,12 @@
 ---
 title: Stm32-捕获寄存器
-date: 2026-08-20 22:14:00
+date: 2026-08-21 22:14:00
 tags:
   - STM32
   - 嵌入式
 categories:
   - 嵌入式
-excerpt: 
+excerpt: 捕获寄存器的介绍
 ---
 
 # 捕获寄存器简介
