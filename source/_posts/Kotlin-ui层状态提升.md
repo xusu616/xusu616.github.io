@@ -6,7 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
-excerpt: 写 Switch Row 组件时纠结要不要在里面写 if 判断，结论是不要——用状态提升。
+excerpt: 写 Switch Row 组件时纠结要不要在里面写 if 判断，结论是不要——用状态提升
 ---
 
 ## 问题
@@ -29,7 +29,7 @@ private fun RowSwitch(name: String) {
 
 ## 方案：受控组件
 
-Switch 的 `checked` 和 `onCheckedChange` 由**上层**提供，组件只负责展示和回调。
+Switch 的 `checked` 和 `onCheckedChange` 由**上层**提供，组件只负责展示和回调
 
 ```kotlin
 @Composable
@@ -62,14 +62,14 @@ RowSwitch(
 
 ## 如果需要判断类型
 
-用 **enum** 代替魔法字符串：
+用 **enum** 代替魔法字符串：//其实包装到stringResource里面也是很方便管理的
 
 ```kotlin
 enum class SwitchOption { BLE_SCAN, CLASSIC_SCAN, LOGGING }
 ```
 
-组件接收枚举，上层做映射——组件内仍然没有业务逻辑。
+组件接收枚举，上层做映射——组件内仍然没有业务逻辑//不太明白这个
 
 ## 总结
 
-这就是 Compose **状态提升（State Hoisting）**：UI 组件保持无状态，数据和行为由上层注入。
+这就是 Compose **状态提升（State Hoisting）**：UI 组件保持无状态，数据和行为由上层注入
