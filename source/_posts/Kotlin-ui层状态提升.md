@@ -6,7 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
-excerpt: 写 Switch Row 组件时纠结要不要在里面写 if 判断，结论是不要——用状态提升
+excerpt: 写 Switch Row 组件时纠结要不要在里面写 if 判断，结论是要用状态提升
 ---
 
 ## 问题
