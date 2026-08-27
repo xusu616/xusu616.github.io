@@ -1,12 +1,12 @@
 ---
-title: Kotlin-判断compose作用域的种类然后写 和 属性委托的使用
+title: Kotlin-判断compose作用域的种类然后写 和 类委托的使用
 date: 2026-08-21 17:00:00
 tags:
   - Kotlin
   - Android
 categories:
   - Kotlin
-excerpt: 在修饰出错时看源码快速判断compose种类然后正确使用 以及 属性委托的使用
+excerpt: 在修饰出错时看源码快速判断compose种类然后正确使用 以及 类委托的使用（类委托和属性委托共用一个关键词by）
 ---
 
 # 在看源码的时候判断compose种类
@@ -114,6 +114,7 @@ inline fun Box(
 既然 Scaffold 不提供作用域，我们就需要手动将它放在一个 Box 中，然后在 Box 的作用域里对 Scaffold 或其他元素使用 Modifier.align
 
 # 属性委托
+>不对这里是类委托
 
 在看kotlin官方文档的时候
 
