@@ -9,7 +9,84 @@ categories:
 excerpt: 快照读一次，订阅持续监听，跨页面同步 使用 同一个 ViewModel 实例
 ---
 
-在 Compose 里从 ViewModel 读值，有两种写法，效果看起来差不多，但原理完全不同
+# 首先我觉得这一段看起来很复杂的可以理一下
+
+就是那段
+
+```kotlin
+    val testStateBatPressDown by (uiPreferencesViewModel?.topComponentPressedDown ?: flowOf(
+        UiPreferences.getTopComponentPressedDown(prefs)
+    )).collectAsState(UiPreferences.getTopComponentPressedDown(prefs))
+```
+
+这里的意思就是
+
+emmm，先看collectAsState作用于什么
+
+这里就是
+```kotlin
+(uiPreferencesViewModel?.topComponentPressedDown ?: flowOf(
+        UiPreferences.getTopComponentPressedDown(prefs)
+    ))
+```
+
+*这里 uiPreferencesViewModel` 是接收的形参，所以说，是小写开头*
+
+对它取了 topComponentPressedDown 的流，然后使用猫王运算符，如果没渠道就取 prefs存着的 `UiPreferences.getTopComponentPressedDown`
+
+这里flow函数的定义是
+
+```kotlin
+public fun <T> flowOf(
+    value: T
+): Flow<T>
+```
+
+就是把这个存入的值转换为固定值的流类型
+
+然后这一坨就能保证有值了
+
+然后对它 `.collectAsState(UiPreferences.getTopComponentPressedDown(prefs)`，就能在流上取到值(这里括号里面的东西是由initial形参接收的，就是没有在流上取到值得时候的值（从持久化的prefs当中取出，相当于初始化~~（形如其名）~~）)
+
+最后它们被包裹在 by 内部 
+
+~~这里可以说我之前那片博客写错了，实际上上面那一篇博客是讲类委托的，但是我把它的名字说成属性委托了~~
+
+这里再简单讲讲属性委托
+
+```kotlin
+  val checked by flow.collectAsState(false)
+  //编译器展开后相当于：                     
+  val _state = flow.collectAsState(false)
+  val checked get() = _state.getValue(this, ::checked)  // 即 _state.value
+```
+
+首先要知道，val 的"只读"指的是这个引用本身不能重新指向别的对象，不是说引用指向的对象内部不能变
+
+uiPreferencesViewModel?.setTopComponentPressedDown(it) 改的是 ViewModel 里的StateFlow，是真实的
+
+stateBarPressDown = it 改的是 MutableState 里的值，是临时的，让按钮可以动
+
+回到前面
+
+也就是说这里修改了testStateBatPressDown的getter方法，然后给了按钮checked = stateBarPressDown，它本质上是一个空壳，并不代表点击按钮的真正逻辑
+
+真正逻辑应该是
+
+```kotlin
+
+    SwitchPrefRow(
+        title = "Weather Top Component Pressed Down",
+        description = "Look bigger?",
+        checked = testStateBarPressDown,
+        onCheckedChange = {
+            uiPreferencesViewModel?.setTopComponentPressedDown(it)
+        }
+    )
+```
+
+
+# 从 ViewModel 读值，有两种写法，效果看起来差不多，但原理不同
 
 ## 快照
 
@@ -103,3 +180,4 @@ composable("settings/{section}") {
 ```
 
 同一个实例，Settings 页调 `setFoo()`，MainScreen 里的 `collectAsState` 就能收到
+
