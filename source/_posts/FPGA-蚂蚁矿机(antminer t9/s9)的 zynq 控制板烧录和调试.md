@@ -1,6 +1,6 @@
 ---
 title: FPGA-蚂蚁矿机(antminer t9/s9)的 zynq 控制板烧录和调试
-date: 2026-08-14 9:14:00
+date: 2026-09-26 0:57:00
 tags:
   - FPGA
   - 嵌入式

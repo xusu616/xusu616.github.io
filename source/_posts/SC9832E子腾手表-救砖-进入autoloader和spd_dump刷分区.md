@@ -4,7 +4,7 @@ date: 2026-09-14 12:00:00
 tags:
   - Android
   - Unisoc
-  - 救砖
+  - 刷机
 categories:
   - Android
 excerpt: 记录一次 SC9832E 子腾手表刷错包变砖再救回来的过程 重点记进入 autoloader 的方法和 spd_dump 刷分区
@@ -30,7 +30,7 @@ splloader 排在最前面
 
 那个包的脚本第一步就是先读出 splloader 再把它擦掉
 
-```
+```plain
 spd_dump --wait 300 exec_addr 0x65015f08 fdl fdl1-dl.bin 0x65000800 fdl fdl2-dl.bin 0x9efffe00 exec r splloader r uboot e splloader e splloader_bak reset
 ```
 
@@ -48,7 +48,7 @@ splloader 一空 BootROM 就没有可以加载的东西
 
 先让 spd_dump 跑起来 它会等 30 秒连接
 
-```
+```plain
 Waiting for connection (30s)
 ```
 
@@ -68,7 +68,7 @@ adb reboot autoloader
 
 连上的时候 spd_dump 会打印
 
-```
+```plain
 CHECK_BAUD bootrom
 BSL_REP_VER: "SPRD4:AutoD\0"
 CMD_CONNECT bootrom
