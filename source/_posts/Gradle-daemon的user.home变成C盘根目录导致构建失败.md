@@ -7,7 +7,7 @@ tags:
   - 构建
 categories:
   - Android
-excerpt: 构建报 C:\.android 权限不足，和代码没关系，是那个残留的 daemon 里 user.home 不对
+excerpt: 构建报 C:\.android 权限不足，残留的 daemon 里 user.home 不对（红温了让ai写得了~~我要去吃大白饭了~~（讲得有点深的地方直接不管就行
 ---
 
 # 现象
@@ -42,7 +42,7 @@ Caused by: java.nio.file.AccessDeniedException: C:\.android
 
 AGP 要往 Android 的 prefs 目录里写 debug keystore 和 analytics
 
-它算出来的目录是 C:\.android
+它算出来的目录是 C:.android
 
 也就是 C 盘根目录
 
