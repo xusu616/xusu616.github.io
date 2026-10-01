@@ -7,6 +7,7 @@ tags:
   - 刷机
 categories:
   - Android
+  - 刷机
 excerpt: 记录一次 SC9832E 子腾手表刷错包变砖再救回来的过程 重点记进入 autoloader 的方法和 spd_dump 刷分区
 ---
 
