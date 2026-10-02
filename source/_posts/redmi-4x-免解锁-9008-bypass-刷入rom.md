@@ -100,11 +100,27 @@ pdd上11块钱买一套就够用了
 
 ![pam20t66-i4amg6-2026-10-03-01-04-20](/img/pam20t66-i4amg6-2026-10-03-01-04-20.png)
 
-会问你要不要挂载系统分区，这个无所谓
+会问你要不要挂载系统分区，这个无所谓，也不用挂，我们的任务是刷入自由而且~~仙静~~先进（存疑？Android 6 -> android 11 毕竟内存太小了）的系统
 
 然后我这里尝试刷入的rom指定了配套的twrp
 
-那就照做吧
+那就照做吧（下图就是redwolf，按道理说 在install 里面选择image然后刷入append的image即可，但是Astra直接帮我做了，我没有在这里使用过非图形界面刷，因为dd到by-name稍微有点反人类，说不定还会对这里加密（不过这里都是自定义rom了，倒是没什么可担心的），不过你可以都试试看，只要刷进去就行）
+
+Astra应该是这样的：（包含了备份刷入检查，感觉比我还细欧）
+
+```
+```powershell
+adb shell "dd if=/dev/block/bootdevice/by-name/recovery of=/tmp/recovery-before-twrp37.bin bs=1048576"
+adb pull /tmp/recovery-before-twrp37.bin ./recovery-before-twrp37.bin
+adb push ./TWRP-3.7.0-A11-20240520-mi8937_4_19-appended.img /tmp/twrp37-appended.img
+adb shell "sha256sum /tmp/twrp37-appended.img"
+adb shell "dd if=/tmp/twrp37-appended.img of=/dev/block/bootdevice/by-name/recovery bs=4096"
+adb shell sync
+adb shell "dd if=/dev/block/bootdevice/by-name/recovery of=/tmp/twrp37-readback.img bs=4096 count=7760"
+adb shell "sha256sum /tmp/twrp37-readback.img"
+# 仅在读回 SHA256 与输入完全一致后：
+adb reboot recovery
+```
 
 ![pam29t66-i6amg6-2026-10-03-01-06-29](/img/pam29t66-i6amg6-2026-10-03-01-06-29.png)
 
