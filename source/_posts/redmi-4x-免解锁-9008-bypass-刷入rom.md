@@ -108,7 +108,6 @@ pdd上11块钱买一套就够用了
 
 Astra应该是这样的：（包含了备份刷入检查，感觉比我还细欧）
 
-```
 ```powershell
 adb shell "dd if=/dev/block/bootdevice/by-name/recovery of=/tmp/recovery-before-twrp37.bin bs=1048576"
 adb pull /tmp/recovery-before-twrp37.bin ./recovery-before-twrp37.bin
