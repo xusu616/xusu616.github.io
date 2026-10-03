@@ -6,6 +6,7 @@ node_modules/
 public/
 .deploy*/
 _multiconfig.yml
+.cache/pixel-garden/
 2025/
 2026/
 2027/

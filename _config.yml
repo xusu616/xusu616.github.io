@@ -99,6 +99,16 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: butterfly
 
+# Open-source weekly pixel garden (GitHub contributions, Monday to Sunday).
+pixel_garden:
+  enable: true
+  username: rD227
+  timezone: Asia/Shanghai
+  hemisphere: north
+  # Optional live refresh via the public, open-source Contributions API.
+  # The locally generated GitHub snapshot remains available if it fails.
+  live_refresh: true
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 #deploy:
