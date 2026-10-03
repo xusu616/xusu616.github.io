@@ -150,7 +150,8 @@
   function renderSprite(sheet, frame, x, y, width, height) {
     return `<svg class="pg-sprite" x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${frame.x} ${frame.y} ${frame.width} ${frame.height}" overflow="hidden" aria-hidden="true"><image href="${escape(sheet.url)}" width="${sheet.width}" height="${sheet.height}" image-rendering="pixelated"/></svg>`;
   }
-  function renderScene(week, sheet) {
+  function renderScene(week, sheet, options) {
+    const plantScale = options && Number.isFinite(options.plantScale) && options.plantScale > 0 ? options.plantScale : 1;
     const p = PALETTES[week.season];
     const winter = week.season === 'winter';
     const rect = (x, y, w, h, fill, extra) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra || ''}/>`;
@@ -173,7 +174,15 @@
       }
     }
     week.days.forEach((day, index) => {
-      const x = 16 + index * 32;
+      const frame = day.count > 0 && !day.future ? spriteFrame(sheet, day.stage) : null;
+      let x = 16 + index * 32;
+      let width, height;
+      if (frame) {
+        height = Math.min([0, 12, 23, 34, 43][day.stage], [0, 9, 15, 22, 27][day.stage] * frame.height / frame.width) * plantScale;
+        width = height * frame.width / frame.height;
+        // Keep enlarged edge plants inside the scene, with room for the wind.
+        x = Math.max(width / 2 + 2, Math.min(x, 224 - width / 2 - 2));
+      }
       const soil = rect(x - 9, 92, 18, 3, p.deep, ' opacity=".35"');
       let plant = '';
       if (day.future || day.count === null) {
@@ -181,10 +190,7 @@
         if (!day.future) plant += `<text x="${x}" y="82" text-anchor="middle" fill="${p.stem}" font-size="9" font-family="monospace">?</text>`;
       } else if (day.stage === 0) {
         plant += rect(x - 2, 86, 4, 3, p.deep) + rect(x - 1, 85, 2, 1, p.light);
-      } else if (spriteFrame(sheet, day.stage)) {
-        const frame = spriteFrame(sheet, day.stage);
-        const height = Math.min([0, 12, 23, 34, 43][day.stage], [0, 9, 15, 22, 27][day.stage] * frame.height / frame.width);
-        const width = height * frame.width / frame.height;
+      } else if (frame) {
         plant = renderSprite(sheet, frame, x - width / 2, 89 - height, width, height);
       } else {
         const heights = [0, 12, 23, 34, 43];
@@ -208,7 +214,10 @@
         }
         if (winter) plant += rect(x - 8, 79, 6, 2, '#f8fbff');
       }
-      if (day.count > 0 && !day.future) plant = `<g class="pg-plant" style="transform-origin:${x}px 89px;--pg-wind-delay:-${index * .63}s;--pg-wind-duration:${4.2 + index % 3 * .6}s">${plant}</g>`;
+      if (day.count > 0 && !day.future) {
+        if (!frame && plantScale !== 1) plant = `<g transform="translate(${x} 89) scale(${plantScale}) translate(${-x} -89)">${plant}</g>`;
+        plant = `<g class="pg-plant" style="transform-origin:${x}px 89px;--pg-wind-delay:-${index * .63}s;--pg-wind-duration:${4.2 + index % 3 * .6}s">${plant}</g>`;
+      }
       const marker = day.today ? rect(x - 3, 104, 6, 2, p.light) : '';
       art += `<g><title>${escape(dayDescription(day))}</title>${soil}${plant}${marker}</g>`;
     });
@@ -291,7 +300,8 @@
   function renderShrub(stage, season, cx, cy, variant) {
     const [width, height] = SHRUB_SIZES[stage];
     const art = makeShrubArt(stage, season, variant);
-    return `<g class="${season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" transform="translate(${cx} ${cy}) scale(${SHRUB_PIXEL * SHRUB_SCALE}) translate(${-width / 2} ${-height / 2})">${art}</g>`;
+    const scale = 2;
+    return `<g class="${season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" transform="translate(${cx} ${cy}) scale(${SHRUB_PIXEL * SHRUB_SCALE * scale}) translate(${-width / 2} ${-height / 2})">${art}</g>`;
   }
 
   // Transparent top-down sprites share the weekly palette; native SVG is the fallback.

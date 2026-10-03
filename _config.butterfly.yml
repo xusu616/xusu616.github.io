@@ -1187,8 +1187,8 @@ inject:
         });
       </script>
 
-    - <script src="/js/pixel-garden-core.js?v=8" defer></script>
-    - <script src="/js/pixel-garden.js?v=8" data-config="/garden/config.json" defer></script>
+    - <script src="/js/pixel-garden-core.js?v=9" defer></script>
+    - <script src="/js/pixel-garden.js?v=9" data-config="/garden/config.json" defer></script>
 
 # CDN Settings
 # ...existing code...
