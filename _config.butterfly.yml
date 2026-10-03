@@ -1066,7 +1066,7 @@ css_prefix: true
 inject:
   head:
     - <link rel="stylesheet" href="/css/starry.css?v=20231210">
-    - <link rel="stylesheet" href="/css/pixel-garden.css?v=8">
+    - <link rel="stylesheet" href="/css/pixel-garden.css?v=10">
     #-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome-animation@1.1.0/css/font-awesome-animation.min.css">
   bottom:
     - <div class="animated-bg"></div>
@@ -1187,8 +1187,8 @@ inject:
         });
       </script>
 
-    - <script src="/js/pixel-garden-core.js?v=9" defer></script>
-    - <script src="/js/pixel-garden.js?v=9" data-config="/garden/config.json" defer></script>
+    - <script src="/js/pixel-garden-core.js?v=10" defer></script>
+    - <script src="/js/pixel-garden.js?v=10" data-config="/garden/config.json" defer></script>
 
 # CDN Settings
 # ...existing code...

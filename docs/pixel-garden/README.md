@@ -32,11 +32,11 @@
 
 ## 英文界面与季节氛围
 
-花园卡片使用 `Weekly Garden` / `Monthly Garden` 英文标题，季节、星期、贡献统计和切换按钮也统一为英文。月视图保留 32 像素地块，透明植物素材在 24 像素的正方形内显示，各阶段保留自然的大小差异。`pixel-garden-core.js` 中的 `SHRUB_SCALE` 默认是 `1.25`，修改这个倍率可以单独调整灌木大小。
+花园卡片使用 `Weekly Garden` / `Monthly Garden` 英文标题，季节、星期、贡献统计和切换按钮也统一为英文。月视图保留 32 像素地块，四个生长阶段的基础显示区域为 8 / 13 / 19 / 24 像素。头像卡片里的月视图（包括手机）默认放大 1.5 倍，主栏大图保持基础尺寸。树冠绘制在全部地块上方，允许自然跨格重叠；边缘树冠保留在整幅画面内。
 
 每季一张透明 PNG，包含萌芽、小树冠、成长期和成熟期四个阶段，按左上、右上、左下、右下排列。春季粉色樱花带暖色花心，夏季是宽圆绿叶冠，秋季金棕枫叶带橙色果实，冬季星形针叶带分层积雪。生成后仅调整配色，向 Weekly Garden 的叶色、花色和雪色靠齐；完整提示词保存在 [SPRITE-PROMPTS.md](SPRITE-PROMPTS.md)。
 
-素材保存在 `source/garden/sprites/`，月视图尺寸与文件名由 `manifest.json` 声明，周视图由 `weekly-manifest.json` 声明。每季每种视角复用一张图集，SVG 的 `viewBox` 选取对应阶段，保留原 PNG 的透明度。周视图使用各阶段的透明边界作为显示区域，将根部固定在地面，并限制株宽避免相邻植物重叠。只在可见时间段创建图片节点，没有预加载所有季节。素材配置缺失时使用保留的原生 SVG 植物；独立徽章继续使用原植物造型，避免外部图片依赖。
+素材保存在 `source/garden/sprites/`，月视图尺寸与文件名由 `manifest.json` 声明，周视图由 `weekly-manifest.json` 声明。每季每种视角复用一张图集，SVG 的 `viewBox` 选取对应阶段，保留原 PNG 的透明度。周视图使用各阶段的透明边界作为显示区域，将根部固定在地面；放大后允许相邻树冠重叠。只在可见时间段创建图片节点，没有预加载所有季节。周视图素材配置缺失时使用保留的原生 SVG 植物；月视图旧 SVG 灌木已移除，素材配置缺失时显示已知贡献数，零贡献、未知与未来日期继续区分。独立徽章继续使用原植物造型，避免外部图片依赖。
 
 周和月的画面中增加按所选季节生成的装饰动画：春季细雨、秋季棕色小落叶、冬季简约白色雪点；夏季保持清朗。它们是季节氛围，未接入实时天气 API，也不代表某地的实际天气。无需位置权限或额外网络请求，滑动到历史日期时也能保持对应季节的视觉效果。
 
@@ -59,7 +59,7 @@
 - `pixel-garden-core.js` 的 `renderWeather`：季节 `duration` 控制粒子下落周期；`--pg-flutter-width` 控制秋叶左右幅度，`--pg-flutter-duration` 控制左右摆动周期。CSS 的 `@keyframes pg-leaf-flutter` 控制翻转角度。
 - 月视图灌木保持静止，以上植物摇摆设置作用于周视图。
 
-侧视植物大小由 `source/js/pixel-garden.js` 顶部的 `SIDEBAR_WEEKLY_PLANT_SCALE` 单独控制，默认 `1.5`。仅头像卡片里的周视图使用该倍率（包括手机）；文章主栏大图使用 `1`，月视图不使用它。通过 `renderScene(week, sheet, { plantScale })` 调整 PNG 侧视植物的宽高，并保持根部在地面；边缘树冠留出摇摆空间。切换位置时重新绘制可见周面板，保留日期和模式。`renderShrub()` 则仅用于月视图没有素材配置时的旧 SVG 回退，修改它不会放大正常的 PNG 植物。
+`source/js/pixel-garden.js` 顶部的 `SIDEBAR_WEEKLY_PLANT_SCALE = 2` 控制侧视植物，`SIDEBAR_MONTHLY_PLANT_SCALE = 1.5` 控制俯视灌木。仅头像卡片里的对应视图使用这些倍率（包括手机）；文章主栏大图两者都使用 `1`。对应接口是 `renderScene(week, sheet, { plantScale })` 和 `renderMonth(month, sheet, { plantScale })`。切换位置时重新绘制可见面板，保留日期和模式。旧月视图的 `makeShrubArt` / `renderShrub`、专用颜色与图形缓存已清理；周视图的原生 SVG 与独立徽章仍保留。
 
 ## 配置
 
