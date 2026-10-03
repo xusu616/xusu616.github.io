@@ -141,7 +141,16 @@
     return `<g class="pg-weather" data-weather="${weather.kind}" aria-hidden="true" pointer-events="none">${particles}</g>`;
   }
 
-  function renderScene(week) {
+  function spriteFrame(sheet, stage) {
+    if (!sheet || !sheet.url || !(sheet.width > 0 && sheet.height > 0)) return null;
+    if (sheet.frames && sheet.frames[stage - 1]) return sheet.frames[stage - 1];
+    const w = sheet.width / 2, h = sheet.height / 2, slot = stage - 1;
+    return { x: slot % 2 * w, y: Math.floor(slot / 2) * h, width: w, height: h };
+  }
+  function renderSprite(sheet, frame, x, y, width, height) {
+    return `<svg class="pg-sprite" x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${frame.x} ${frame.y} ${frame.width} ${frame.height}" overflow="hidden" aria-hidden="true"><image href="${escape(sheet.url)}" width="${sheet.width}" height="${sheet.height}" image-rendering="pixelated"/></svg>`;
+  }
+  function renderScene(week, sheet) {
     const p = PALETTES[week.season];
     const winter = week.season === 'winter';
     const rect = (x, y, w, h, fill, extra) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra || ''}/>`;
@@ -172,6 +181,11 @@
         if (!day.future) plant += `<text x="${x}" y="82" text-anchor="middle" fill="${p.stem}" font-size="9" font-family="monospace">?</text>`;
       } else if (day.stage === 0) {
         plant += rect(x - 2, 86, 4, 3, p.deep) + rect(x - 1, 85, 2, 1, p.light);
+      } else if (spriteFrame(sheet, day.stage)) {
+        const frame = spriteFrame(sheet, day.stage);
+        const height = Math.min([0, 12, 23, 34, 43][day.stage], [0, 9, 15, 22, 27][day.stage] * frame.height / frame.width);
+        const width = height * frame.width / frame.height;
+        plant = renderSprite(sheet, frame, x - width / 2, 89 - height, width, height);
       } else {
         const heights = [0, 12, 23, 34, 43];
         const top = 89 - heights[day.stage];
@@ -280,8 +294,8 @@
     return `<g class="${season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" transform="translate(${cx} ${cy}) scale(${SHRUB_PIXEL * SHRUB_SCALE}) translate(${-width / 2} ${-height / 2})">${art}</g>`;
   }
 
-  // Original top-down shrubs share the weekly scene's integer pixels and palette.
-  function renderMonth(month) {
+  // Transparent top-down sprites share the weekly palette; native SVG is the fallback.
+  function renderMonth(month, sheet) {
     const p = PALETTES[month.season];
     const rows = month.cells.length / 7;
     const rect = (x, y, w, h, fill, extra) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra || ''}/>`;
@@ -297,7 +311,10 @@
       let shrub = '';
       if (day.count === 0) shrub = rect(cx - 1, cy, 3, 2, p.deep) + rect(cx, cy - 1, 1, 1, p.light);
       else if (day.count > 0) {
-        if (day.stage === 1) {
+        if (spriteFrame(sheet, day.stage)) {
+          const size = (sheet.frames ? [0, 8, 13, 19, 24][day.stage] : 24) * SHRUB_SCALE / 1.25;
+          shrub = `<g class="${month.season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}">${renderSprite(sheet, spriteFrame(sheet, day.stage), cx - size / 2, cy - size / 2, size, size)}</g>`;
+        } else if (day.stage === 1) {
           shrub = rect(cx, cy - 2, 1, 6, p.stem) + rect(cx - 3, cy - 2, 3, 2, p.leaf) + rect(cx + 1, cy - 4, 3, 2, p.light);
         } else {
           const [width, height] = SHRUB_SIZES[day.stage];
