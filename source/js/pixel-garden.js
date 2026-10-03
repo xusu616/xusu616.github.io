@@ -9,6 +9,8 @@
   const states = new WeakMap();
   const history = new Map();
   const historyRequests = new Map();
+  const desktop = window.matchMedia('(min-width: 901px)');
+  let preferredPosition = readStorage('pixel-garden-position') === 'main' ? 'main' : 'sidebar';
   let config, data, loading, currentDay, activeWidget;
 
   async function readJson(url) {
@@ -62,8 +64,8 @@
     return `<button type="button" class="${classes}" data-date="${day.date}" aria-label="${label}" title="${label}"${day.today ? ' aria-current="date"' : ''}>${content}</button>`;
   }
   function panelHtml(period, mode) {
-    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period)}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
-      `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period)}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
+    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period, config.weeklySpriteSheets && config.weeklySpriteSheets[period.season])}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
+      `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period, config.spriteSheets && config.spriteSheets[period.season])}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
     return visual;
   }
   // Empty shells preserve scroll geometry; only intersecting panels get artwork.
@@ -337,9 +339,65 @@
     else if (valid(data)) writeStorage(cacheKey(), data);
     document.querySelectorAll('.pixel-garden').forEach(widget => { const state = states.get(widget); requestHistory(state.active); });
   }
+  function mainLocation() {
+    const post = document.querySelector('#post');
+    if (post) {
+      const comments = post.querySelector('#post-comment');
+      const separator = comments && comments.previousElementSibling;
+      return { parent: post, before: separator && separator.matches('hr.custom-hr') ? separator : comments };
+    }
+    const recent = document.querySelector('#recent-posts');
+    return recent ? { parent: recent, before: recent.firstElementChild } : null;
+  }
+  function placeGarden(widget, reveal) {
+    const card = document.querySelector('#aside-content .card-info');
+    const main = desktop.matches && preferredPosition === 'main' && mainLocation();
+    const placement = main ? 'main' : 'sidebar';
+    if (card && (widget.dataset.placement !== placement || widget.parentElement !== (main ? main.parent : card))) {
+      const state = states.get(widget);
+      const viewport = widget.querySelector('.pg-viewport');
+      const oldWidth = viewport.getBoundingClientRect().width;
+      const position = oldWidth ? viewport.scrollLeft / oldWidth : state.activeOffset - state.offsets[0];
+      widget.dataset.placement = placement;
+      if (main) main.parent.insertBefore(widget, main.before);
+      else card.appendChild(widget);
+      const width = viewport.getBoundingClientRect().width;
+      state.width = width;
+      viewport.scrollLeft = position * width;
+      const bounds = viewport.getBoundingClientRect();
+      state.inView = typeof IntersectionObserver !== 'function' || bounds.top < innerHeight && bounds.bottom > 0;
+      updateControls(widget);
+    }
+    const button = document.querySelector('#pixel-garden-position');
+    if (button) {
+      button.hidden = !mainLocation();
+      const expanded = widget.dataset.placement === 'main';
+      button.setAttribute('aria-pressed', String(expanded));
+      button.title = expanded ? 'Move garden to avatar card' : 'Expand garden in main content';
+      button.setAttribute('aria-label', button.title);
+    }
+    if (reveal) widget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function installPositionButton(widget) {
+    const menu = document.querySelector('#rightside-config-hide');
+    if (!menu || document.querySelector('#pixel-garden-position')) return;
+    const button = document.createElement('button');
+    button.id = 'pixel-garden-position';
+    button.type = 'button';
+    button.setAttribute('aria-controls', 'pixel-garden');
+    button.innerHTML = '<i class="fas fa-seedling" aria-hidden="true"></i>';
+    button.addEventListener('click', () => {
+      if (!desktop.matches || !activeWidget || !activeWidget.isConnected) return;
+      preferredPosition = activeWidget.dataset.placement === 'main' ? 'sidebar' : 'main';
+      writeStorage('pixel-garden-position', preferredPosition);
+      placeGarden(activeWidget, true);
+    });
+    menu.appendChild(button);
+    placeGarden(widget);
+  }
   async function mount() {
     const card = document.querySelector('#aside-content .card-info');
-    if (!card || card.querySelector('.pixel-garden')) return;
+    if (!card) return;
     if (activeWidget && !activeWidget.isConnected) {
       const previous = states.get(activeWidget);
       if (previous.resize) previous.resize.disconnect();
@@ -348,11 +406,17 @@
       states.delete(activeWidget);
       activeWidget = null;
     }
+    if (activeWidget && activeWidget.isConnected) {
+      installPositionButton(activeWidget);
+      placeGarden(activeWidget);
+      return;
+    }
     try {
       if (!config) config = (await readJson(configUrl)).value;
-      if (config.enable === false || !card.isConnected || card.querySelector('.pixel-garden')) return;
+      if (config.enable === false || !card.isConnected || document.querySelector('.pixel-garden')) return;
       currentDay = core.dateKey(new Date(), config.timezone);
       const widget = document.createElement('section');
+      widget.id = 'pixel-garden';
       widget.className = 'pixel-garden';
       widget.setAttribute('aria-label', 'GitHub pixel garden');
       widget.innerHTML = `
@@ -370,6 +434,8 @@
       activeWidget = widget;
       paint(widget, true);
       bindTimeline(widget);
+      installPositionButton(widget);
+      placeGarden(widget);
       if (!loading) loading = loadData().finally(() => { loading = null; });
       await loading;
     } catch (_) { /* Missing config leaves the author card usable. */ }
@@ -391,6 +457,9 @@
   if (document.readyState === 'complete') mount();
   else document.addEventListener('DOMContentLoaded', mount, { once: true });
   document.addEventListener('pjax:complete', mount);
+  desktop.addEventListener('change', () => {
+    if (activeWidget && activeWidget.isConnected) placeGarden(activeWidget);
+  });
   document.addEventListener('visibilitychange', () => {
     refreshDay();
     document.querySelectorAll('.pixel-garden').forEach(syncPanels);

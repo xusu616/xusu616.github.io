@@ -180,6 +180,30 @@ test('cherry canopies reflect growth without turning missing or future days into
   assert.ok(!summer.includes('pg-sakura-canopy'));
 });
 
+test('sprite atlas stages select separate cells without drawing zero, unknown or future plants', () => {
+  const counts = [0, 1, 3, 6, 10].map((count, i) => ({ date: core.shiftDate('2026-04-01', i), count }));
+  const month = core.makeMonth(counts, '2026-04-07');
+  const svg = core.renderMonth(month, { url: '/blog/garden/sprites/spring.png?a=1&b=2', width: 1254, height: 1254 });
+  assert.equal((svg.match(/<image /g) || []).length, 4);
+  for (const slot of ['0 0', '627 0', '0 627', '627 627']) assert.ok(svg.includes(`viewBox="${slot} 627 627"`));
+  assert.ok(svg.includes('href="/blog/garden/sprites/spring.png?a=1&amp;b=2"'));
+  assert.ok(svg.includes('2026-04-06 Mon: Contributions unavailable'));
+  assert.ok(svg.includes('2026-04-08 Wed: Not yet'));
+});
+
+test('weekly image plants stay rooted at the wind pivot and respect column width', () => {
+  const counts = [0, 1, 3, 6, 10].map((count, i) => ({ date: core.shiftDate('2026-09-28', i), count }));
+  const frames = Array.from({ length: 4 }, (_, i) => ({ x: i % 2 * 100, y: Math.floor(i / 2) * 100, width: 70, height: 90 }));
+  const scene = core.renderScene(core.makeWeek(counts, '2026-10-03'), { url: '/tree.png', width: 200, height: 200, frames });
+  assert.equal((scene.match(/<image /g) || []).length, 4);
+  assert.equal((scene.match(/class="pg-plant"/g) || []).length, 4);
+  for (const match of scene.matchAll(/class="pg-sprite" x="[^"]+" y="([^"]+)" width="([^"]+)" height="([^"]+)"/g)) {
+    assert.ok(Math.abs(Number(match[1]) + Number(match[3]) - 89) < 1e-9);
+    assert.ok(Number(match[2]) <= 27);
+  }
+  assert.ok(!core.renderBadge(core.makeWeek(counts, '2026-10-03'), 'rD227').includes('<image '));
+});
+
 test('generator writes a real snapshot, reuses cache on failure, and handles no cache', async t => {
   const base = await fs.mkdtemp(path.join(os.tmpdir(), 'pixel-garden-test-'));
   const originalFetch = global.fetch;
@@ -199,6 +223,16 @@ test('generator writes a real snapshot, reuses cache on failure, and handles no 
   const route = name => routes.find(item => item.path === name);
   assert.equal(JSON.parse(route('garden/config.json').data).snapshotUrl, '/blog/garden/data.json');
   assert.equal(JSON.parse(route('garden/config.json').data).liveRefresh, false);
+  assert.equal(JSON.parse(route('garden/config.json').data).spriteSheets, undefined);
+  hexo.source_dir = path.join(__dirname, '..', 'source');
+  routes = await generate(hexo);
+  const sheets = JSON.parse(route('garden/config.json').data).spriteSheets;
+  assert.deepEqual(Object.keys(sheets), ['spring', 'summer', 'autumn', 'winter']);
+  assert.equal(sheets.spring.url, '/blog/garden/sprites/spring-growth-v1.png');
+  assert.equal(sheets.spring.width, 1254);
+  const weeklySheets = JSON.parse(route('garden/config.json').data).weeklySpriteSheets;
+  assert.equal(weeklySheets.winter.url, '/blog/garden/sprites/winter-weekly-v1.png');
+  assert.equal(weeklySheets.winter.frames.length, 4);
   assert.equal(JSON.parse(route('garden/data.json').data).contributions.length, 7);
   global.fetch = async () => { throw new Error('offline'); };
   routes = await generate(hexo);

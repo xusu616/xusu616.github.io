@@ -61,8 +61,21 @@ async function generate(hexo) {
     } catch (error) { hexo.log.warn(`[pixel-garden] Could not save cache: ${error.message}`); }
   }
   const root = hexo.config.root || '/';
+  async function readSheets(filename) {
+    try {
+      const manifest = JSON.parse(await fs.readFile(path.join(hexo.source_dir || path.join(hexo.base_dir, 'source'), 'garden', 'sprites', filename), 'utf8'));
+      return Object.fromEntries(['spring', 'summer', 'autumn', 'winter'].map(season => {
+        const sheet = manifest[season];
+        if (!sheet || !/^[a-z0-9-]+\.png$/.test(sheet.file) || !Number.isInteger(sheet.width) || !Number.isInteger(sheet.height) || sheet.width <= 0 || sheet.height <= 0) throw new Error('Invalid sprite manifest');
+        if (sheet.frames && (sheet.frames.length !== 4 || sheet.frames.some(frame => !['x', 'y', 'width', 'height'].every(key => Number.isInteger(frame[key])) || frame.x < 0 || frame.y < 0 || frame.width <= 0 || frame.height <= 0 || frame.x + frame.width > sheet.width || frame.y + frame.height > sheet.height))) throw new Error('Invalid sprite frames');
+        return [season, { url: `${root}garden/sprites/${sheet.file}`, width: sheet.width, height: sheet.height, frames: sheet.frames }];
+      }));
+    } catch (_) { return undefined; /* Missing artwork uses the original code-native plants. */ }
+  }
+  const spriteSheets = await readSheets('manifest.json');
+  const weeklySpriteSheets = await readSheets('weekly-manifest.json');
   const config = { enable: true, username, timezone, hemisphere, liveRefresh: settings.live_refresh !== false,
-    snapshotUrl: `${root}garden/data.json` };
+    snapshotUrl: `${root}garden/data.json`, spriteSheets, weeklySpriteSheets };
   return [
     { path: 'garden/config.json', data: JSON.stringify(config) },
     { path: 'garden/data.json', data: JSON.stringify(snapshot) },
