@@ -6,13 +6,14 @@
   'use strict';
 
   const DAY = 86400000;
-  const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
-  const STAGES = ['种子', '萌芽', '展叶', '含苞', '盛放'];
+  const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const STAGES = ['Seed', 'Sprout', 'Leaves', 'Bud', 'Bloom'];
+  const VIEW_TITLES = { week: 'Weekly Garden', month: 'Monthly Garden' };
   const PALETTES = {
-    spring: { label: '春 · 新生', sky: '#eaf4ef', mist: '#d2e8d9', hill: '#bad4bc', grass: '#8cae79', soil: '#bda385', deep: '#9b8069', stem: '#477759', leaf: '#75a965', light: '#afd183', flower: '#df8fa3', petal: '#f5c3ca', sun: '#f5db9b' },
-    summer: { label: '夏 · 繁茂', sky: '#e5f2ee', mist: '#c8e5dd', hill: '#a4cbbb', grass: '#6aab78', soil: '#b69d7e', deep: '#917861', stem: '#2b6952', leaf: '#4f9c68', light: '#8cc577', flower: '#eabc58', petal: '#f7dc86', sun: '#f5d887' },
-    autumn: { label: '秋 · 收获', sky: '#faf0df', mist: '#efe1c7', hill: '#d9c9a9', grass: '#b3ae77', soil: '#b99a7b', deep: '#96775f', stem: '#7d7150', leaf: '#bc8c54', light: '#ddb76b', flower: '#c8754b', petal: '#e8ac67', sun: '#efcc83' },
-    winter: { label: '冬 · 蓄力', sky: '#ebf0f5', mist: '#d9e3ec', hill: '#bdcdd7', grass: '#d3dfe3', soil: '#a6aba8', deep: '#858f91', stem: '#587774', leaf: '#7b9d94', light: '#adc5b7', flower: '#8499b8', petal: '#c6d4e9', sun: '#f0ddae' }
+    spring: { label: 'Spring · Bloom', sky: '#eaf4ef', mist: '#d2e8d9', hill: '#bad4bc', grass: '#8cae79', soil: '#bda385', deep: '#9b8069', stem: '#477759', leaf: '#75a965', light: '#afd183', flower: '#df8fa3', petal: '#f5c3ca', sun: '#f5db9b' },
+    summer: { label: 'Summer · Thrive', sky: '#e5f2ee', mist: '#c8e5dd', hill: '#a4cbbb', grass: '#6aab78', soil: '#b69d7e', deep: '#917861', stem: '#2b6952', leaf: '#4f9c68', light: '#8cc577', flower: '#eabc58', petal: '#f7dc86', sun: '#f5d887' },
+    autumn: { label: 'Autumn · Harvest', sky: '#faf0df', mist: '#efe1c7', hill: '#d9c9a9', grass: '#b3ae77', soil: '#b99a7b', deep: '#96775f', stem: '#7d7150', leaf: '#bc8c54', light: '#ddb76b', flower: '#c8754b', petal: '#e8ac67', sun: '#efcc83' },
+    winter: { label: 'Winter · Rest', sky: '#ebf0f5', mist: '#d9e3ec', hill: '#bdcdd7', grass: '#d3dfe3', soil: '#a6aba8', deep: '#858f91', stem: '#587774', leaf: '#7b9d94', light: '#adc5b7', flower: '#8499b8', petal: '#c6d4e9', sun: '#f0ddae' }
   };
 
   function escape(value) {
@@ -111,9 +112,31 @@
   }
 
   function dayDescription(day) {
-    if (day.future) return `${day.date} 周${day.label}：尚未到来`;
-    if (day.count === null) return `${day.date} 周${day.label}：贡献数据暂不可用`;
-    return `${day.date} 周${day.label}：${day.count} 次贡献 · ${STAGES[day.stage]}`;
+    if (day.future) return `${day.date} ${day.label}: Not yet`;
+    if (day.count === null) return `${day.date} ${day.label}: Contributions unavailable`;
+    return `${day.date} ${day.label}: ${day.count} ${day.count === 1 ? 'contribution' : 'contributions'} · ${STAGES[day.stage]}`;
+  }
+
+  // Decorative seasonal atmosphere, independent of live weather or location.
+  function renderWeather(season, width, height) {
+    const types = {
+      spring: { kind: 'rain', count: 12, color: '#769fa6', duration: 2.6 },
+      autumn: { kind: 'leaves', count: 7, color: '#96775f', duration: 7 },
+      winter: { kind: 'snow', count: 11, color: '#ffffff', duration: 6 }
+    };
+    const weather = types[season];
+    if (!weather) return '';
+    let particles = '';
+    for (let index = 0; index < weather.count; index++) {
+      const x = 5 + (index * 37 + index % 3 * 11) % (width - 10);
+      const duration = weather.duration + index % 4 * .45;
+      const drift = weather.kind === 'rain' ? -8 : 8 + index % 4 * 5;
+      const size = weather.kind === 'rain' ? 1 : 1 + index % 2;
+      const particleHeight = weather.kind === 'rain' ? 4 : size;
+      const delay = -((index + 1) * 1.31 % duration).toFixed(2);
+      particles += `<g transform="translate(${x} -6)"><g class="pg-weather-particle pg-weather-${weather.kind}" style="--pg-fall-distance:${height + 12}px;--pg-fall-drift:${drift}px;--pg-fall-duration:${duration}s;--pg-fall-delay:${delay}s;opacity:0"><rect width="${size}" height="${particleHeight}" fill="${weather.color}"/></g></g>`;
+    }
+    return `<g class="pg-weather" data-weather="${weather.kind}" aria-hidden="true" pointer-events="none">${particles}</g>`;
   }
 
   function renderScene(week) {
@@ -174,7 +197,8 @@
       art += `<g><title>${escape(dayDescription(day))}</title>${soil}${plant}${marker}</g>`;
     });
     if (week.season === 'autumn') art += rect(52, 43, 3, 2, p.flower) + rect(158, 54, 2, 3, p.light);
-    return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene" viewBox="0 0 224 112" role="img" aria-label="${escape(`${p.label}，周一至周日的贡献花园`)}" shape-rendering="crispEdges"><title>${escape(`${p.label} · Oneweek Garden`)}</title>${art}</svg>`;
+    art += renderWeather(week.season, 224, 112);
+    return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene" viewBox="0 0 224 112" role="img" aria-label="${escape(`${p.label}, Monday to Sunday contribution garden`)}" shape-rendering="crispEdges"><title>${escape(`${p.label} · ${VIEW_TITLES.week}`)}</title>${art}</svg>`;
   }
 
   // Original top-down shrubs share the weekly scene's integer pixels and palette.
@@ -195,33 +219,44 @@
       if (day.count === 0) shrub = rect(cx - 1, cy, 3, 2, p.deep) + rect(cx, cy - 1, 1, 1, p.light);
       else if (day.count > 0) {
         if (day.stage === 1) {
-          shrub = rect(cx, cy - 3, 2, 8, p.stem) + rect(cx - 4, cy - 3, 4, 3, p.leaf) + rect(cx + 2, cy - 5, 4, 3, p.light);
+          shrub = rect(cx, cy - 2, 1, 6, p.stem) + rect(cx - 3, cy - 2, 3, 2, p.leaf) + rect(cx + 1, cy - 4, 3, 2, p.light);
         } else {
-          const size = day.stage === 2 ? 5 : day.stage === 3 ? 7 : 9;
-          shrub += rect(cx - size + 1, cy + size - 1, size * 2, 3, p.deep, ' opacity=".4"');
-          shrub += `<path d="M${cx - size} ${cy - size + 4}h2v-2h3v-2h${size * 2 - 10}v2h3v2h2v${size * 2 - 8}h-2v2h-3v2h-${size * 2 - 10}v-2h-3v-2h-2z" fill="${p.stem}"/>`;
-          shrub += rect(cx - size + 2, cy - size + 4, size * 2 - 4, size * 2 - 6, p.leaf);
-          shrub += rect(cx - size + 4, cy - size + 2, size * 2 - 8, 3, p.light);
-          shrub += rect(cx - 3, cy - 3, 3, 2, p.light) + rect(cx + 2, cy + 2, 3, 2, p.stem);
-          if (day.stage === 4) {
-            for (const [dx, dy] of [[-4, -3], [3, -5], [4, 3], [-2, 5]]) {
-              shrub += rect(cx + dx, cy + dy, 3, 3, p.flower) + rect(cx + dx, cy + dy, 2, 1, p.petal);
+          // Compact 8 / 12 / 14 px canopies keep space around the day numbers.
+          const size = day.stage === 2 ? 4 : day.stage === 3 ? 6 : 7;
+          const sakura = month.season === 'spring';
+          const outline = sakura ? '#b8748c' : p.stem;
+          const canopy = sakura ? p.flower : p.leaf;
+          const highlight = sakura ? p.petal : p.light;
+          const middle = size * 2 - 6;
+          shrub += rect(cx - size + 2, cy + size - 1, size * 2 - 3, 2, p.deep, ' opacity=".3"');
+          shrub += `<path class="${sakura ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" d="M${cx - size + 3} ${cy - size}h${middle}v1h2v2h1v${middle}h-1v2h-2v1h-${middle}v-1h-2v-2h-1v-${middle}h1v-2h2z" fill="${outline}"/>`;
+          shrub += rect(cx - size + 1, cy - size + 3, size * 2 - 2, middle, canopy);
+          shrub += rect(cx - size + 3, cy - size + 1, middle, 3, highlight);
+          shrub += rect(cx - size + 3, cy + size - 3, middle, 2, canopy);
+          shrub += rect(cx - 2, cy - 1, 2, 1, highlight) + rect(cx + 2, cy + 2, 1, 1, outline);
+          if (sakura) {
+            const petals = day.stage === 2 ? [[-1, -1], [1, 1]] : [[-3, -2], [2, -3], [3, 1], [-1, 3]];
+            for (const [dx, dy] of petals) {
+              shrub += rect(cx + dx, cy + dy, 2, 2, p.petal) + rect(cx + dx, cy + dy, 1, 1, '#fbe6ed');
             }
+          } else if (day.stage === 4) {
+            for (const [dx, dy] of [[-3, -2], [2, -3], [3, 2], [-1, 3]]) shrub += rect(cx + dx, cy + dy, 2, 2, p.flower) + rect(cx + dx, cy + dy, 1, 1, p.petal);
           }
-          if (month.season === 'winter') shrub += rect(cx - size + 4, cy - size + 2, size * 2 - 8, 2, '#f8fbff') + rect(cx - 4, cy - 2, 5, 2, '#f8fbff');
+          if (month.season === 'winter') shrub += rect(cx - size + 3, cy - size + 1, middle, 2, '#f8fbff') + rect(cx - 3, cy - 1, 3, 1, '#f8fbff');
         }
         shrub = `<g class="pg-shrub" style="transform-origin:${cx}px ${cy}px;--pg-wind-delay:-${index % 7 * .63}s;--pg-wind-duration:${4.8 + index % 3 * .6}s">${shrub}</g>`;
       } else if (!day.future) shrub = `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="monospace" font-size="8" fill="${p.stem}">?</text>`;
       art += `<g${day.future ? ' opacity=".45"' : ''}><title>${escape(dayDescription(day))}</title>${tile}${shrub}</g>`;
     });
-    return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene pg-month-scene" viewBox="0 0 224 ${rows * 32}" role="img" aria-label="${escape(`${month.start.slice(0, 7)} · ${p.label}，俯视灌木贡献花园`)}" shape-rendering="crispEdges">${art}</svg>`;
+    art += renderWeather(month.season, 224, rows * 32);
+    return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene pg-month-scene" viewBox="0 0 224 ${rows * 32}" role="img" aria-label="${escape(`${month.start.slice(0, 7)} · ${p.label}, top-down shrub contribution garden`)}" shape-rendering="crispEdges">${art}</svg>`;
   }
 
   function renderBadge(week, username) {
     const date = `${week.start.slice(5).replace('-', '/')} — ${week.end.slice(5).replace('-', '/')}`;
-    const total = week.complete ? `本周 ${week.total} 次贡献` : '贡献数据暂不可用';
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="208" viewBox="0 0 280 208" role="img" aria-label="${escape(`${username} · ${total}`)}"><rect width="280" height="208" rx="12" fill="#fffaf3"/><g font-family="system-ui, sans-serif" fill="#655a47"><text x="16" y="26" font-size="14" font-weight="600">Oneweek Garden</text><text x="264" y="25" font-size="11" text-anchor="end">${PALETTES[week.season].label}</text><text x="16" y="45" font-size="10">${date}</text></g><svg x="16" y="55" width="248" height="124" viewBox="0 0 224 112">${renderScene(week).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg><text x="16" y="196" font-family="system-ui, sans-serif" font-size="11" fill="#655a47">${escape(total)} · @${escape(username)}</text></svg>`;
+    const total = week.complete ? `${week.total} contributions this week` : 'Contributions unavailable';
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="208" viewBox="0 0 280 208" role="img" aria-label="${escape(`${username} · ${total}`)}"><rect width="280" height="208" rx="12" fill="#fffaf3"/><g font-family="system-ui, sans-serif" fill="#655a47"><text x="16" y="26" font-size="14" font-weight="600">${VIEW_TITLES.week}</text><text x="264" y="25" font-size="11" text-anchor="end">${PALETTES[week.season].label}</text><text x="16" y="45" font-size="10">${date}</text></g><svg x="16" y="55" width="248" height="124" viewBox="0 0 224 112">${renderScene(week).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg><text x="16" y="196" font-family="system-ui, sans-serif" font-size="11" fill="#655a47">${escape(total)} · @${escape(username)}</text></svg>`;
   }
 
-  return { PALETTES, STAGES, escape, dateKey, shiftDate, shiftMonth, seasonFor, stageFor, makeWeek, makeMonth, dayDescription, renderScene, renderMonth, renderBadge };
+  return { PALETTES, STAGES, VIEW_TITLES, WEEKDAYS, escape, dateKey, shiftDate, shiftMonth, seasonFor, stageFor, makeWeek, makeMonth, dayDescription, renderScene, renderMonth, renderWeather, renderBadge };
 });

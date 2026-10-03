@@ -9,7 +9,7 @@
   const states = new WeakMap();
   const history = new Map();
   const historyRequests = new Map();
-  let config, data, loading, currentDay;
+  let config, data, loading, currentDay, activeWidget;
 
   async function readJson(url) {
     const controller = new AbortController();
@@ -55,26 +55,26 @@
     return `<button type="button" class="${classes}" data-date="${day.date}" aria-label="${label}" title="${label}"${day.today ? ' aria-current="date"' : ''}>${content}</button>`;
   }
   function panelHtml(period, mode, offset) {
-    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period)}</div><div class="pg-week" role="group" aria-label="每日贡献">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
-      `<div class="pg-month-weekdays" aria-hidden="true">${['一', '二', '三', '四', '五', '六', '日'].map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period)}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} 每日贡献">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
+    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period)}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
+      `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period)}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
     return `<div class="pg-panel" data-offset="${offset}" data-season="${period.season}">${visual}</div>`;
   }
   function freshLabel(period) {
-    if (!data) return '正在读取 GitHub 贡献…';
-    if (!valid(data)) return '暂时无法读取贡献，稍后刷新即可';
-    const updated = new Intl.DateTimeFormat('zh-CN', { timeZone: config.timezone, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(data.updatedAt));
+    if (!data) return 'Loading GitHub contributions…';
+    if (!valid(data)) return 'Contributions unavailable. Try refreshing.';
+    const updated = new Intl.DateTimeFormat('en-GB', { timeZone: config.timezone, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(data.updatedAt));
     const stale = data.stale || Date.now() - Date.parse(data.updatedAt) > 2 * CACHE_TTL;
     if (!period.complete && period.start <= currentDay) {
       const years = period.days.filter(day => !day.future && day.count === null).map(day => day.date.slice(0, 4));
-      if (years.some(year => historyRequests.get(year) === 'loading')) return '正在读取这一年的贡献…';
-      return `${stale ? '缓存 · ' : ''}更新于 ${updated} · 所选日期数据待更新`;
+      if (years.some(year => historyRequests.get(year) === 'loading')) return 'Loading historical contributions…';
+      return `${stale ? 'Cached · ' : ''}Updated ${updated} · Selected dates pending`;
     }
-    return `${stale ? '缓存 · ' : ''}更新于 ${updated}`;
+    return `${stale ? 'Cached · ' : ''}Updated ${updated}`;
   }
   function updateControls(widget) {
     const state = states.get(widget);
     const viewport = widget.querySelector('.pg-viewport');
-    const width = viewport.clientWidth;
+    const width = viewport.getBoundingClientRect().width;
     if (!width) return;
     const index = Math.max(0, Math.min(state.offsets.length - 1, Math.floor((viewport.scrollLeft + width / 2) / width)));
     const offset = state.offsets[index];
@@ -82,13 +82,13 @@
     state.active = period;
     state.activeOffset = offset;
     widget.dataset.season = period.season;
-    widget.querySelector('.pg-title-text').textContent = state.mode === 'week' ? '一周小花园' : '一月小花园';
+    widget.querySelector('.pg-title-text').textContent = core.VIEW_TITLES[state.mode];
     widget.querySelector('.pg-season').textContent = core.PALETTES[period.season].label;
-    const label = state.mode === 'week' ? `${period.start.slice(0, 4)} · ${period.start.slice(5).replace('-', '.')} — ${period.end.slice(5).replace('-', '.')}` : `${period.start.slice(0, 4)} 年 ${Number(period.start.slice(5, 7))} 月`;
+    const label = state.mode === 'week' ? `${period.start.slice(0, 4)} · ${period.start.slice(5).replace('-', '.')} — ${period.end.slice(5).replace('-', '.')}` : new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${period.start}T00:00:00Z`));
     widget.querySelector('.pg-range-label').textContent = label;
-    widget.querySelector('.pg-total').innerHTML = period.start > currentDay ? '尚未到来' : period.complete ? `<strong>${period.total}</strong> 次贡献` : '贡献数据暂不可用';
-    const previous = state.mode === 'week' ? '上周' : '上月';
-    const trend = period.delta === null ? '' : period.delta === 0 ? `与${previous}同期持平` : `较${previous}同期 ${period.delta > 0 ? '+' : '−'}${Math.abs(period.delta)}`;
+    widget.querySelector('.pg-total').innerHTML = period.start > currentDay ? 'Not yet' : period.complete ? `<strong>${period.total}</strong> ${period.total === 1 ? 'contribution' : 'contributions'}` : 'Contributions unavailable';
+    const previous = state.mode === 'week' ? 'week' : 'month';
+    const trend = period.delta === null ? '' : period.delta === 0 ? `Same as last ${previous}` : `${period.delta > 0 ? '+' : '−'}${Math.abs(period.delta)} vs last ${previous}`;
     widget.querySelector('.pg-trend').textContent = trend;
     widget.querySelector('.pg-freshness').textContent = freshLabel(period);
     const max = viewport.scrollWidth - width;
@@ -98,6 +98,10 @@
     widget.querySelector('.pg-now').hidden = period.days.some(day => day.today);
     widget.querySelector('.pg-detail').hidden = !state.detail;
     widget.querySelector('.pg-detail').textContent = state.detail || '';
+    viewport.querySelectorAll('.pg-panel').forEach((panel, panelIndex) => {
+      panel.dataset.visible = String(panelIndex * width < viewport.scrollLeft + width - .5 && (panelIndex + 1) * width > viewport.scrollLeft + .5);
+      panel.inert = panel.dataset.visible !== 'true';
+    });
     if (state.lastPeriod !== period.start) {
       state.lastPeriod = period.start;
       state.detail = '';
@@ -112,14 +116,14 @@
     widget.dataset.view = state.mode;
     widget.querySelectorAll('.pg-view-button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === state.mode)));
     viewport.querySelector('.pg-track').innerHTML = state.offsets.map(offset => panelHtml(model(state, offset), state.mode, offset)).join('');
-    viewport.scrollLeft = reset ? 3 * viewport.clientWidth : left;
+    viewport.scrollLeft = reset ? 3 * viewport.getBoundingClientRect().width : left;
     updateControls(widget);
   }
   // Seven panels form a moving window. Recycle the distant end without snapping.
   function extendTimeline(widget) {
     const state = states.get(widget);
     const viewport = widget.querySelector('.pg-viewport');
-    const width = viewport.clientWidth;
+    const width = viewport.getBoundingClientRect().width;
     if (!width || state.scrubbing) return;
     const left = viewport.scrollLeft;
     let shift = 0;
@@ -169,7 +173,7 @@
       if (event.target !== viewport || !['ArrowLeft', 'ArrowRight', 'Home'].includes(event.key)) return;
       event.preventDefault();
       if (event.key === 'Home') resetTo(widget, currentDay, state.mode);
-      else viewport.scrollLeft += (event.key === 'ArrowLeft' ? -1 : 1) * viewport.clientWidth / 5;
+      else viewport.scrollLeft += (event.key === 'ArrowLeft' ? -1 : 1) * viewport.getBoundingClientRect().width / 5;
     });
     viewport.addEventListener('pointerdown', event => {
       if (event.pointerType !== 'mouse' || event.button !== 0) return;
@@ -222,9 +226,15 @@
       writeStorage('pixel-garden-view', button.dataset.view);
     }));
     widget.querySelector('.pg-now').addEventListener('click', () => resetTo(widget, currentDay, state.mode));
+    if (typeof IntersectionObserver === 'function') {
+      state.visibility = new IntersectionObserver(entries => {
+        widget.dataset.paused = String(!entries[0].isIntersecting);
+      });
+      state.visibility.observe(widget);
+    }
     if (typeof ResizeObserver === 'function') {
       state.resize = new ResizeObserver(() => {
-        const width = viewport.clientWidth;
+        const width = viewport.getBoundingClientRect().width;
         if (state.width && width !== state.width) {
           viewport.scrollLeft = (state.activeOffset - state.offsets[0]) * width;
           updateControls(widget);
@@ -290,25 +300,34 @@
   async function mount() {
     const card = document.querySelector('#aside-content .card-info');
     if (!card || card.querySelector('.pixel-garden')) return;
+    if (activeWidget && !activeWidget.isConnected) {
+      const previous = states.get(activeWidget);
+      if (previous.resize) previous.resize.disconnect();
+      if (previous.visibility) previous.visibility.disconnect();
+      if (previous.frame) cancelAnimationFrame(previous.frame);
+      states.delete(activeWidget);
+      activeWidget = null;
+    }
     try {
       if (!config) config = (await readJson(configUrl)).value;
       if (config.enable === false || !card.isConnected || card.querySelector('.pixel-garden')) return;
       currentDay = core.dateKey(new Date(), config.timezone);
       const widget = document.createElement('section');
       widget.className = 'pixel-garden';
-      widget.setAttribute('aria-label', 'GitHub 像素植物花园');
+      widget.setAttribute('aria-label', 'GitHub pixel garden');
       widget.innerHTML = `
         <div class="pg-heading"><span class="pg-title"><span class="pg-leaf" aria-hidden="true"></span><span class="pg-title-text"></span></span><span class="pg-season"></span></div>
         <div class="pg-subheading"><span class="pg-range-label"></span><a class="pg-profile" href="https://github.com/${encodeURIComponent(config.username)}" target="_blank" rel="noopener noreferrer">@${core.escape(config.username)}</a></div>
-        <div class="pg-viewport" tabindex="0" role="region" aria-label="横向拖动、左右滑动或 Shift 加滚轮浏览日期"><div class="pg-track"></div></div>
-        <input class="pg-scrollbar" type="range" min="0" max="1000" step="1" value="500" aria-label="拖动滚动条连续浏览花园日期" title="拖动浏览 · 可持续向两侧滑动">
+        <div class="pg-viewport" tabindex="0" role="region" aria-label="Drag, swipe or Shift-scroll to browse dates"><div class="pg-track"></div></div>
+        <input class="pg-scrollbar" type="range" min="0" max="1000" step="1" value="500" aria-label="Scroll through garden dates" title="Drag to browse continuously in either direction">
         <div class="pg-summary"><span class="pg-total"></span><span class="pg-trend"></span></div>
         <p class="pg-detail" aria-live="polite" hidden></p>
         <div class="pg-freshness" role="status"></div>
-        <div class="pg-footer"><button type="button" class="pg-now" hidden>回到今天</button><div class="pg-view-switch" role="group" aria-label="花园视图"><button type="button" class="pg-view-button" data-view="week" aria-pressed="true">周</button><button type="button" class="pg-view-button" data-view="month" aria-pressed="false">月</button></div></div>`;
+        <div class="pg-footer"><button type="button" class="pg-now" hidden>Today</button><div class="pg-view-switch" role="group" aria-label="Garden view"><button type="button" class="pg-view-button" data-view="week" aria-pressed="true">Week</button><button type="button" class="pg-view-button" data-view="month" aria-pressed="false">Month</button></div></div>`;
       const savedMode = readStorage('pixel-garden-view');
       states.set(widget, { mode: savedMode === 'month' ? 'month' : 'week', anchor: currentDay, offsets: [-3, -2, -1, 0, 1, 2, 3], detail: '' });
       card.appendChild(widget);
+      activeWidget = widget;
       paint(widget, true);
       bindTimeline(widget);
       if (!loading) loading = loadData().finally(() => { loading = null; });
