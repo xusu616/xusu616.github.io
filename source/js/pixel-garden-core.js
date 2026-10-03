@@ -134,7 +134,9 @@
       const size = weather.kind === 'rain' ? 1 : 1 + index % 2;
       const particleHeight = weather.kind === 'rain' ? 4 : size;
       const delay = -((index + 1) * 1.31 % duration).toFixed(2);
-      particles += `<g transform="translate(${x} -6)"><g class="pg-weather-particle pg-weather-${weather.kind}" style="--pg-fall-distance:${height + 12}px;--pg-fall-drift:${drift}px;--pg-fall-duration:${duration}s;--pg-fall-delay:${delay}s;opacity:0"><rect width="${size}" height="${particleHeight}" fill="${weather.color}"/></g></g>`;
+      const pixel = `<rect width="${size}" height="${particleHeight}" fill="${weather.color}"/>`;
+      const shape = weather.kind === 'leaves' ? `<g class="pg-leaf-flutter" style="--pg-flutter-width:${5 + index % 3 * 2}px;--pg-flutter-duration:${2.8 + index % 4 * .4}s">${pixel}</g>` : pixel;
+      particles += `<g transform="translate(${x} -6)"><g class="pg-weather-particle pg-weather-${weather.kind}" style="--pg-fall-distance:${height + 12}px;--pg-fall-drift:${drift}px;--pg-fall-duration:${duration}s;--pg-fall-delay:${delay}s;opacity:0">${shape}</g></g>`;
     }
     return `<g class="pg-weather" data-weather="${weather.kind}" aria-hidden="true" pointer-events="none">${particles}</g>`;
   }
@@ -201,6 +203,56 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene" viewBox="0 0 224 112" role="img" aria-label="${escape(`${p.label}, Monday to Sunday contribution garden`)}" shape-rendering="crispEdges"><title>${escape(`${p.label} · ${VIEW_TITLES.week}`)}</title>${art}</svg>`;
   }
 
+  // Hand-pixelled clusters: broken contours, upper-left light and shaded leaf pockets.
+  // Runs of the same color share a single path, keeping the SVG small.
+  const SHRUB_SPRITES = {
+    2: [
+      '..dd....', '.dlldd..', 'dlhllmd.', 'dllmlldd',
+      'dlmsmlmd', '.dmlmmsd', '..dsssd.', '...ddd..'
+    ],
+    3: [
+      '....ddd.....', '..ddllldd...', '.dlhhllmld..', 'dlhllmllhld.',
+      'dllmlslmllmd', 'dlhlmllmlmsd', '.dllmslmlmsd', 'dlmlmmlsmmd.',
+      '.dmmslmlmsd.', '..dmsmmssd..', '...ddssdd...', '.....dd.....'
+    ],
+    4: [
+      '.....ddd......', '...ddllldd....', '..dlhhlllld...', '.dlhllmlmhldd.',
+      '.dllmlsllhllmd', 'ddlmllhlmllmsd', 'dlhllmlsmlmlmd', 'dllmsllmllmssd',
+      '.dmlslmlmmlmd.', 'dlhlmmlssmlmd.', '.dmmsslmlmsd..', '..dmsmmlssd...',
+      '...ddsssdd....', '.....ddd......'
+    ]
+  };
+  function renderShrub(stage, season, cx, cy) {
+    const p = PALETTES[season];
+    const sakura = season === 'spring';
+    const sprite = SHRUB_SPRITES[stage];
+    const colors = sakura
+      ? { d: '#a26580', s: '#c47d99', m: '#e39cb7', l: '#f5bfd0', h: '#ffe7ed' }
+      : { d: p.stem, s: season === 'autumn' ? '#a17848' : season === 'winter' ? '#63857a' : '#41815a', m: p.leaf, l: p.light, h: season === 'winter' ? '#f8fbff' : season === 'autumn' ? '#efcc83' : '#b9db91' };
+    const paths = {};
+    sprite.forEach((row, y) => {
+      for (let x = 0; x < row.length;) {
+        const color = row[x];
+        let end = x + 1;
+        while (end < row.length && row[end] === color) end++;
+        if (color !== '.') paths[color] = (paths[color] || '') + `M${cx - row.length / 2 + x} ${cy - sprite.length / 2 + y}h${end - x}v1h-${end - x}z`;
+        x = end;
+      }
+    });
+    let art = Object.entries(paths).map(([color, d]) => `<path fill="${colors[color]}" d="${d}"/>`).join('');
+    if (stage >= 3) {
+      if (sakura) {
+        // A few petals overlap the darker pockets; green peeks out below the flowers.
+        art += `<path d="M${cx - 3} ${cy - 3}h2v1h-2z M${cx + 2} ${cy}h1v2h-1z" fill="#fff0ed"/><path d="M${cx + 2} ${cy + 4}h2v1h-2z" fill="${p.stem}"/>`;
+      } else if (season === 'winter') {
+        art += `<path d="M${cx - 3} ${cy - 4}h3v1h-3z M${cx + 2} ${cy - 2}h2v1h-2z" fill="#f8fbff"/>`;
+      } else if (stage === 4) {
+        art += `<path d="M${cx - 3} ${cy - 2}h2v2h-2z M${cx + 3} ${cy + 1}h2v2h-2z" fill="${p.flower}"/><path d="M${cx - 3} ${cy - 2}h1v1h-1z M${cx + 3} ${cy + 1}h1v1h-1z" fill="${p.petal}"/>`;
+      }
+    }
+    return `<g class="${sakura ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}">${art}</g>`;
+  }
+
   // Original top-down shrubs share the weekly scene's integer pixels and palette.
   function renderMonth(month) {
     const p = PALETTES[month.season];
@@ -221,28 +273,9 @@
         if (day.stage === 1) {
           shrub = rect(cx, cy - 2, 1, 6, p.stem) + rect(cx - 3, cy - 2, 3, 2, p.leaf) + rect(cx + 1, cy - 4, 3, 2, p.light);
         } else {
-          // Compact 8 / 12 / 14 px canopies keep space around the day numbers.
-          const size = day.stage === 2 ? 4 : day.stage === 3 ? 6 : 7;
-          const sakura = month.season === 'spring';
-          const outline = sakura ? '#b8748c' : p.stem;
-          const canopy = sakura ? p.flower : p.leaf;
-          const highlight = sakura ? p.petal : p.light;
-          const middle = size * 2 - 6;
-          shrub += rect(cx - size + 2, cy + size - 1, size * 2 - 3, 2, p.deep, ' opacity=".3"');
-          shrub += `<path class="${sakura ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" d="M${cx - size + 3} ${cy - size}h${middle}v1h2v2h1v${middle}h-1v2h-2v1h-${middle}v-1h-2v-2h-1v-${middle}h1v-2h2z" fill="${outline}"/>`;
-          shrub += rect(cx - size + 1, cy - size + 3, size * 2 - 2, middle, canopy);
-          shrub += rect(cx - size + 3, cy - size + 1, middle, 3, highlight);
-          shrub += rect(cx - size + 3, cy + size - 3, middle, 2, canopy);
-          shrub += rect(cx - 2, cy - 1, 2, 1, highlight) + rect(cx + 2, cy + 2, 1, 1, outline);
-          if (sakura) {
-            const petals = day.stage === 2 ? [[-1, -1], [1, 1]] : [[-3, -2], [2, -3], [3, 1], [-1, 3]];
-            for (const [dx, dy] of petals) {
-              shrub += rect(cx + dx, cy + dy, 2, 2, p.petal) + rect(cx + dx, cy + dy, 1, 1, '#fbe6ed');
-            }
-          } else if (day.stage === 4) {
-            for (const [dx, dy] of [[-3, -2], [2, -3], [3, 2], [-1, 3]]) shrub += rect(cx + dx, cy + dy, 2, 2, p.flower) + rect(cx + dx, cy + dy, 1, 1, p.petal);
-          }
-          if (month.season === 'winter') shrub += rect(cx - size + 3, cy - size + 1, middle, 2, '#f8fbff') + rect(cx - 3, cy - 1, 3, 1, '#f8fbff');
+          const size = day.stage === 2 ? 8 : day.stage === 3 ? 12 : 14;
+          tile += rect(cx - size / 2 + 1, cy + size / 2 - 1, size - 2, 2, p.deep, ' opacity=".25"');
+          shrub = renderShrub(day.stage, month.season, cx, cy);
         }
         shrub = `<g class="pg-shrub" style="transform-origin:${cx}px ${cy}px;--pg-wind-delay:-${index % 7 * .63}s;--pg-wind-duration:${4.8 + index % 3 * .6}s">${shrub}</g>`;
       } else if (!day.future) shrub = `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="monospace" font-size="8" fill="${p.stem}">?</text>`;
