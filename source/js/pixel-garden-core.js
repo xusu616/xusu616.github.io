@@ -226,90 +226,14 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene" viewBox="0 0 224 112" role="img" aria-label="${escape(`${p.label}, Monday to Sunday contribution garden`)}" shape-rendering="crispEdges"><title>${escape(`${p.label} · ${VIEW_TITLES.week}`)}</title>${art}</svg>`;
   }
 
-  // Original clustered pixel art, generated once per season, stage and silhouette.
-  // Subpixel-sized source pixels add detail without enlarging the monthly tiles.
-  const SHRUB_SCALE = 1.25;
-  const SHRUB_PIXEL = .6;
-  const SHRUB_SIZES = { 2: [14, 12], 3: [20, 18], 4: [24, 22] };
-  const SHRUB_COLORS = {
-    spring: { d: '#774754', s: '#b96886', m: '#dd8eaa', l: '#f1b3c9', h: '#ffe0e8', v: '#507653', f: '#fff0e9', c: '#d9b77e' },
-    summer: { d: '#2f513b', s: '#3f7047', m: '#638e4e', l: '#8bb85f', h: '#bad987', v: '#477047', f: '#edd17e', c: '#fff0ba' },
-    autumn: { d: '#624b35', s: '#905b39', m: '#b47b43', l: '#d19a57', h: '#e8bd7b', v: '#6b774a', f: '#c96e3d', c: '#efad66' },
-    winter: { d: '#334f50', s: '#4f7270', m: '#72958a', l: '#aac3b7', h: '#e9f4f6', v: '#56796b', f: '#f8fcff', c: '#ffffff' }
-  };
-  const shrubArt = new Map();
-  function makeShrubArt(stage, season, variant) {
-    const key = `${season}:${stage}:${variant}`;
-    if (shrubArt.has(key)) return shrubArt.get(key);
-    const [width, height] = SHRUB_SIZES[stage];
-    // Overlapping leaf tufts form seven irregular lobes with visible pockets between them.
-    const lobes = [
-      [-.16, -.28, .23, .21], [.16, -.22, .23, .23],
-      [-.31, -.01, .19, .25], [0, .02, .25, .25], [.30, .05, .20, .24],
-      [-.17, .27, .23, .20], [.17, .26, .22, .21]
-    ].map(([x, y, rx, ry], i) => ({
-      x: width * (.5 + x) + (variant === 1 && i % 3 === 0 ? 1 : variant === 2 && i % 2 === 0 ? -1 : 0),
-      y: height * (.5 + y), rx: width * rx, ry: height * ry
-    }));
-    const coverage = (x, y) => {
-      let best = { score: -1, dx: 0, dy: 0 };
-      for (const lobe of lobes) {
-        const dx = (x + .5 - lobe.x) / lobe.rx, dy = (y + .5 - lobe.y) / lobe.ry;
-        const score = 1 - (season === 'winter' && stage >= 3 ? Math.abs(dx) * .85 + Math.abs(dy) : dx * dx + dy * dy);
-        if (score > best.score) best = { score, dx, dy };
-      }
-      return best;
-    };
-    const pixels = Array.from({ length: height }, () => Array(width).fill('.'));
-    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-      const { score, dx, dy } = coverage(x, y);
-      if (score < 0) continue;
-      const noise = ((x * 37 + y * 61 + x * y * 7 + variant * 19) % 101) / 100;
-      const light = .48 + score * .23 - dy * .18 - dx * .12 + (noise - .5) * .24;
-      const edge = [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([ox, oy]) => coverage(x + ox, y + oy).score < 0);
-      let color = edge ? (dy > .1 || dx > .6 ? 'd' : 's') : light < .38 ? 's' : light < .62 ? 'm' : light < .82 ? 'l' : 'h';
-      // Snow rests on the upper faces of boughs, leaving evergreen shadows exposed.
-      if (season === 'winter' && !edge && dy < -.15 && score > .15 && noise > .24) color = noise > .75 ? 'f' : 'h';
-      if (season === 'spring' && y > height * .68 && edge && noise > .62) color = 'v';
-      pixels[y][x] = color;
-    }
-    const stamp = (px, py, pattern) => pattern.forEach((row, y) => [...row].forEach((color, x) => {
-      const xx = px + x, yy = py + y;
-      if (color !== '.' && pixels[yy]?.[xx] && pixels[yy][xx] !== '.') pixels[yy][xx] = color;
-    }));
-    if (season === 'spring' && stage >= 3) {
-      const flowers = stage === 4 ? [[.30,.29],[.62,.24],[.49,.48],[.23,.63],[.70,.66]] : [[.32,.29],[.64,.48],[.38,.66]];
-      flowers.forEach(([x, y], i) => stamp(Math.round(x * width) - 1, Math.round(y * height) - 1, i % 2 ? ['.l.', 'fcf', '.f.'] : ['.f.', 'fcf', '.l.']));
-    } else if (stage === 4 && season !== 'winter') {
-      [[.3,.4],[.68,.58]].forEach(([x, y]) => stamp(Math.round(x * width), Math.round(y * height), season === 'autumn' ? ['cf', 'ff'] : ['.f.', 'fcf', '.f.']));
-    }
-    const paths = {};
-    pixels.forEach((row, y) => {
-      for (let x = 0; x < width;) {
-        const color = row[x];
-        let end = x + 1;
-        while (end < width && row[end] === color) end++;
-        if (color !== '.') paths[color] = (paths[color] || '') + `M${x} ${y}h${end - x}v1h-${end - x}z`;
-        x = end;
-      }
-    });
-    const art = Object.entries(paths).map(([color, d]) => `<path fill="${SHRUB_COLORS[season][color]}" d="${d}"/>`).join('');
-    shrubArt.set(key, art);
-    return art;
-  }
-  function renderShrub(stage, season, cx, cy, variant) {
-    const [width, height] = SHRUB_SIZES[stage];
-    const art = makeShrubArt(stage, season, variant);
-    const scale = 2;
-    return `<g class="${season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}" transform="translate(${cx} ${cy}) scale(${SHRUB_PIXEL * SHRUB_SCALE * scale}) translate(${-width / 2} ${-height / 2})">${art}</g>`;
-  }
-
-  // Transparent top-down sprites share the weekly palette; native SVG is the fallback.
-  function renderMonth(month, sheet) {
+  // Paint all ground first so enlarged crowns can overlap neighboring plots.
+  function renderMonth(month, sheet, options) {
+    const plantScale = options && Number.isFinite(options.plantScale) && options.plantScale > 0 ? options.plantScale : 1;
     const p = PALETTES[month.season];
     const rows = month.cells.length / 7;
     const rect = (x, y, w, h, fill, extra) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra || ''}/>`;
     let art = rect(0, 0, 224, rows * 32, p.sky);
+    let plants = '';
     month.cells.forEach((day, index) => {
       if (!day) return;
       const x = index % 7 * 32, y = Math.floor(index / 7) * 32;
@@ -322,21 +246,18 @@
       if (day.count === 0) shrub = rect(cx - 1, cy, 3, 2, p.deep) + rect(cx, cy - 1, 1, 1, p.light);
       else if (day.count > 0) {
         if (spriteFrame(sheet, day.stage)) {
-          const size = (sheet.frames ? [0, 8, 13, 19, 24][day.stage] : 24) * SHRUB_SCALE / 1.25;
-          shrub = `<g class="${month.season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}">${renderSprite(sheet, spriteFrame(sheet, day.stage), cx - size / 2, cy - size / 2, size, size)}</g>`;
-        } else if (day.stage === 1) {
-          shrub = rect(cx, cy - 2, 1, 6, p.stem) + rect(cx - 3, cy - 2, 3, 2, p.leaf) + rect(cx + 1, cy - 4, 3, 2, p.light);
+          const size = (sheet.frames ? [0, 8, 13, 19, 24][day.stage] : 24) * plantScale;
+          const centerX = Math.max(size / 2 + 1, Math.min(cx, 223 - size / 2));
+          const centerY = Math.max(size / 2 + 1, Math.min(cy, rows * 32 - 1 - size / 2));
+          shrub = `<g class="pg-shrub"><g class="${month.season === 'spring' ? 'pg-sakura-canopy' : 'pg-shrub-canopy'}">${renderSprite(sheet, spriteFrame(sheet, day.stage), centerX - size / 2, centerY - size / 2, size, size)}</g></g>`;
         } else {
-          const [width, height] = SHRUB_SIZES[day.stage];
-          const size = Math.round(width * SHRUB_PIXEL * SHRUB_SCALE);
-          const bottom = Math.round(height * SHRUB_PIXEL * SHRUB_SCALE / 2);
-          tile += rect(cx - Math.floor(size / 2) + 1, cy + bottom - 1, size - 2, 2, p.deep, ' opacity=".25"');
-          shrub = renderShrub(day.stage, month.season, cx, cy, Number(day.date.slice(-2)) % 3);
+          shrub = `<text class="pg-month-value" x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="monospace" font-size="8" fill="${p.stem}">${day.count}</text>`;
         }
-        shrub = `<g class="pg-shrub" style="transform-origin:${cx}px ${cy}px;--pg-wind-delay:-${index % 7 * .63}s;--pg-wind-duration:${4.8 + index % 3 * .6}s">${shrub}</g>`;
       } else if (!day.future) shrub = `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="monospace" font-size="8" fill="${p.stem}">?</text>`;
-      art += `<g${day.future ? ' opacity=".45"' : ''}><title>${escape(dayDescription(day))}</title>${tile}${shrub}</g>`;
+      art += `<g${day.future ? ' opacity=".45"' : ''}><title>${escape(dayDescription(day))}</title>${tile}</g>`;
+      plants += shrub;
     });
+    art += `<g class="pg-month-plants" aria-hidden="true">${plants}</g>`;
     art += renderWeather(month.season, 224, rows * 32);
     return `<svg xmlns="http://www.w3.org/2000/svg" class="pg-scene pg-month-scene" viewBox="0 0 224 ${rows * 32}" role="img" aria-label="${escape(`${month.start.slice(0, 7)} · ${p.label}, top-down shrub contribution garden`)}" shape-rendering="crispEdges">${art}</svg>`;
   }

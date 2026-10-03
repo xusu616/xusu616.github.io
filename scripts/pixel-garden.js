@@ -70,7 +70,7 @@ async function generate(hexo) {
         if (sheet.frames && (sheet.frames.length !== 4 || sheet.frames.some(frame => !['x', 'y', 'width', 'height'].every(key => Number.isInteger(frame[key])) || frame.x < 0 || frame.y < 0 || frame.width <= 0 || frame.height <= 0 || frame.x + frame.width > sheet.width || frame.y + frame.height > sheet.height))) throw new Error('Invalid sprite frames');
         return [season, { url: `${root}garden/sprites/${sheet.file}`, width: sheet.width, height: sheet.height, frames: sheet.frames }];
       }));
-    } catch (_) { return undefined; /* Missing artwork uses the original code-native plants. */ }
+    } catch (_) { return undefined; /* Renderers handle missing artwork. */ }
   }
   const spriteSheets = await readSheets('manifest.json');
   const weeklySpriteSheets = await readSheets('weekly-manifest.json');

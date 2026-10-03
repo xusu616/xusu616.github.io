@@ -8,6 +8,8 @@
   const CACHE_TTL = 60 * 60 * 1000;
   // Side-view plants in the avatar card, on desktop and mobile. Main view uses 1.
   const SIDEBAR_WEEKLY_PLANT_SCALE = 2;
+  // Top-down shrubs in the avatar card. Main monthly view uses 1.
+  const SIDEBAR_MONTHLY_PLANT_SCALE = 1.5;
   const states = new WeakMap();
   const history = new Map();
   const historyRequests = new Map();
@@ -67,7 +69,7 @@
   }
   function panelHtml(period, mode, placement) {
     const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period, config.weeklySpriteSheets && config.weeklySpriteSheets[period.season], { plantScale: placement === 'sidebar' ? SIDEBAR_WEEKLY_PLANT_SCALE : 1 })}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
-      `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period, config.spriteSheets && config.spriteSheets[period.season])}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
+      `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period, config.spriteSheets && config.spriteSheets[period.season], { plantScale: placement === 'sidebar' ? SIDEBAR_MONTHLY_PLANT_SCALE : 1 })}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
     return visual;
   }
   // Empty shells preserve scroll geometry; only intersecting panels get artwork.
@@ -363,7 +365,7 @@
       widget.dataset.placement = placement;
       if (main) main.parent.insertBefore(widget, main.before);
       else card.appendChild(widget);
-      if (state.mode === 'week') widget.querySelectorAll('.pg-panel').forEach(panel => panel.replaceChildren());
+      widget.querySelectorAll('.pg-panel').forEach(panel => panel.replaceChildren());
       const width = viewport.getBoundingClientRect().width;
       state.width = width;
       viewport.scrollLeft = position * width;

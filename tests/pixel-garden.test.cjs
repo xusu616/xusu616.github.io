@@ -141,7 +141,7 @@ test('wind applies only to living plants and monthly SVG retains all calendar ce
   assert.equal((scene.match(/class="pg-plant"/g) || []).length, 1);
   assert.ok(scene.includes('transform-origin:48px 89px'));
   const month = core.makeMonth(counts, '2026-10-03', 'north', '2026-09-01');
-  const svg = core.renderMonth(month);
+  const svg = core.renderMonth(month, { url: '/spring.png', width: 1254, height: 1254 });
   assert.equal((svg.match(/<title>/g) || []).length, 30);
   assert.equal((svg.match(/class="pg-shrub"/g) || []).length, 1);
   assert.ok(svg.includes('viewBox="0 0 224 192"'));
@@ -166,17 +166,18 @@ test('weather follows the viewed season in both views, including hemisphere inve
   assert.ok(core.renderMonth(south).includes('data-weather="rain"'));
 });
 
-test('cherry canopies reflect growth without turning missing or future days into shrubs', () => {
+test('cherry canopies reflect growth without turning missing or future days into shrubs', async () => {
+  const sheets = JSON.parse(await fs.readFile(path.join(__dirname, '..', 'source', 'garden', 'sprites', 'manifest.json'), 'utf8'));
   const counts = [0, 1, 3, 6, 10].map((count, i) => ({ date: core.shiftDate('2026-04-01', i), count }));
-  const spring = core.renderMonth(core.makeMonth(counts, '2026-04-07'));
+  const spring = core.renderMonth(core.makeMonth(counts, '2026-04-07'), { ...sheets.spring, url: sheets.spring.file });
   assert.equal((spring.match(/class="pg-shrub"/g) || []).length, 4);
-  assert.equal((spring.match(/class="pg-sakura-canopy"/g) || []).length, 3);
+  assert.equal((spring.match(/class="pg-sakura-canopy"/g) || []).length, 4);
   assert.ok(!spring.includes('class="pg-shrub-canopy"'));
   assert.ok(spring.includes('2026-04-06 Mon: Contributions unavailable'));
   assert.ok(spring.includes('2026-04-08 Wed: Not yet'));
   assert.ok(spring.includes('2026-04-05 Sun: 10 contributions · Bloom'));
-  const summer = core.renderMonth(core.makeMonth(counts.map(day => ({ ...day, date: day.date.replace('-04-', '-07-') })), '2026-07-07'));
-  assert.equal((summer.match(/class="pg-shrub-canopy"/g) || []).length, 3);
+  const summer = core.renderMonth(core.makeMonth(counts.map(day => ({ ...day, date: day.date.replace('-04-', '-07-') })), '2026-07-07'), { ...sheets.summer, url: sheets.summer.file });
+  assert.equal((summer.match(/class="pg-shrub-canopy"/g) || []).length, 4);
   assert.ok(!summer.includes('pg-sakura-canopy'));
 });
 
@@ -221,6 +222,39 @@ test('side-view scale enlarges real seasonal sprites while keeping roots and edg
       assert.ok(x >= 2 - 1e-9 && x + width <= 222 + 1e-9);
     });
   }
+});
+
+test('monthly scaling allows overlap above all ground tiles and retains complete edge crowns', async () => {
+  const sheets = JSON.parse(await fs.readFile(path.join(__dirname, '..', 'source', 'garden', 'sprites', 'manifest.json'), 'utf8'));
+  const boxes = svg => Array.from(svg.matchAll(/class="pg-sprite" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/g), match => match.slice(1).map(Number));
+  const dates = { spring: '2026-04-01', summer: '2026-07-01', autumn: '2026-09-01', winter: '2026-01-01' };
+  for (const [season, sheet] of Object.entries(sheets)) {
+    const date = dates[season];
+    const month = core.makeMonth(Array.from({ length: 30 }, (_, i) => ({ date: core.shiftDate(date, i), count: i < 5 ? [0, 1, 3, 6, 10][i] : 10 })), '2026-10-03', 'north', date);
+    const artwork = { ...sheet, url: sheet.file };
+    const normal = boxes(core.renderMonth(month, artwork));
+    const svg = core.renderMonth(month, artwork, { plantScale: 1.5 });
+    const larger = boxes(svg);
+    assert.equal(larger.length, 29);
+    larger.forEach(([x, y, width, height], i) => {
+      assert.equal(width, normal[i][2] * 1.5);
+      assert.equal(height, normal[i][3] * 1.5);
+      assert.ok(x >= 1 && x + width <= 223 && y >= 1 && y + height <= 191);
+    });
+    assert.ok(larger.some(([, , width]) => width > 32));
+    assert.ok(svg.lastIndexOf('</title>') < svg.indexOf('<g class="pg-month-plants"'));
+  }
+});
+
+test('monthly artwork missing shows known counts separately from zero, unknown and future days', () => {
+  const month = core.makeMonth([{ date: '2026-10-01', count: 0 }, { date: '2026-10-02', count: 7 }], '2026-10-03');
+  const svg = core.renderMonth(month);
+  assert.equal((svg.match(/class="pg-month-value"/g) || []).length, 1);
+  assert.ok(/class="pg-month-value"[^>]+>7<\/text>/.test(svg));
+  assert.ok(svg.includes('2026-10-01 Thu: 0 contributions'));
+  assert.ok(svg.includes('2026-10-03 Sat: Contributions unavailable'));
+  assert.ok(svg.includes('2026-10-04 Sun: Not yet'));
+  assert.ok(!svg.includes('<image ') && !svg.includes('class="pg-shrub"'));
 });
 
 test('generator writes a real snapshot, reuses cache on failure, and handles no cache', async t => {
