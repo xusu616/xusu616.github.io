@@ -59,6 +59,8 @@
 - `pixel-garden-core.js` 的 `renderWeather`：季节 `duration` 控制粒子下落周期；`--pg-flutter-width` 控制秋叶左右幅度，`--pg-flutter-duration` 控制左右摆动周期。CSS 的 `@keyframes pg-leaf-flutter` 控制翻转角度。
 - 月视图灌木保持静止，以上植物摇摆设置作用于周视图。
 
+侧视植物大小由 `source/js/pixel-garden.js` 顶部的 `SIDEBAR_WEEKLY_PLANT_SCALE` 单独控制，默认 `1.5`。仅头像卡片里的周视图使用该倍率（包括手机）；文章主栏大图使用 `1`，月视图不使用它。通过 `renderScene(week, sheet, { plantScale })` 调整 PNG 侧视植物的宽高，并保持根部在地面；边缘树冠留出摇摆空间。切换位置时重新绘制可见周面板，保留日期和模式。`renderShrub()` 则仅用于月视图没有素材配置时的旧 SVG 回退，修改它不会放大正常的 PNG 植物。
+
 ## 配置
 
 主配置 `_config.yml`：

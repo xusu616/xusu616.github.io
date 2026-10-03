@@ -6,6 +6,8 @@
   const script = document.currentScript;
   const configUrl = script && script.dataset.config || '/garden/config.json';
   const CACHE_TTL = 60 * 60 * 1000;
+  // Side-view plants in the avatar card, on desktop and mobile. Main view uses 1.
+  const SIDEBAR_WEEKLY_PLANT_SCALE = 2;
   const states = new WeakMap();
   const history = new Map();
   const historyRequests = new Map();
@@ -63,8 +65,8 @@
     const content = month ? `<span class="pg-month-number">${Number(day.date.slice(8))}</span>` : `<span>${day.label}</span><span class="pg-count">${day.future ? '·' : day.count === null ? '?' : day.count}</span>`;
     return `<button type="button" class="${classes}" data-date="${day.date}" aria-label="${label}" title="${label}"${day.today ? ' aria-current="date"' : ''}>${content}</button>`;
   }
-  function panelHtml(period, mode) {
-    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period, config.weeklySpriteSheets && config.weeklySpriteSheets[period.season])}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
+  function panelHtml(period, mode, placement) {
+    const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period, config.weeklySpriteSheets && config.weeklySpriteSheets[period.season], { plantScale: placement === 'sidebar' ? SIDEBAR_WEEKLY_PLANT_SCALE : 1 })}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
       `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period, config.spriteSheets && config.spriteSheets[period.season])}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
     return visual;
   }
@@ -82,7 +84,7 @@
       if (visible && !panel.hasChildNodes()) {
         const period = model(state, Number(panel.dataset.offset));
         panel.dataset.season = period.season;
-        panel.innerHTML = panelHtml(period, state.mode);
+        panel.innerHTML = panelHtml(period, state.mode, widget.dataset.placement);
       } else if (!visible && panel.hasChildNodes()) panel.replaceChildren();
     });
   }
@@ -361,6 +363,7 @@
       widget.dataset.placement = placement;
       if (main) main.parent.insertBefore(widget, main.before);
       else card.appendChild(widget);
+      if (state.mode === 'week') widget.querySelectorAll('.pg-panel').forEach(panel => panel.replaceChildren());
       const width = viewport.getBoundingClientRect().width;
       state.width = width;
       viewport.scrollLeft = position * width;

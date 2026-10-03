@@ -204,6 +204,25 @@ test('weekly image plants stay rooted at the wind pivot and respect column width
   assert.ok(!core.renderBadge(core.makeWeek(counts, '2026-10-03'), 'rD227').includes('<image '));
 });
 
+test('side-view scale enlarges real seasonal sprites while keeping roots and edge crowns inside the scene', async () => {
+  const sheets = JSON.parse(await fs.readFile(path.join(__dirname, '..', 'source', 'garden', 'sprites', 'weekly-manifest.json'), 'utf8'));
+  const dates = { spring: '2026-04-06', summer: '2026-07-06', autumn: '2026-09-07', winter: '2026-01-05' };
+  const boxes = svg => Array.from(svg.matchAll(/class="pg-sprite" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/g), match => match.slice(1).map(Number));
+  for (const [season, date] of Object.entries(dates)) {
+    const week = core.makeWeek(Array.from({ length: 7 }, (_, i) => ({ date: core.shiftDate(date, i), count: [10, 1, 3, 6, 10, 3, 10][i] })), '2026-10-03', 'north', date);
+    const sheet = { ...sheets[season], url: sheets[season].file };
+    const normal = boxes(core.renderScene(week, sheet));
+    const larger = boxes(core.renderScene(week, sheet, { plantScale: 1.5 }));
+    assert.equal(larger.length, 7);
+    larger.forEach(([x, y, width, height], i) => {
+      assert.ok(Math.abs(width - normal[i][2] * 1.5) < 1e-9);
+      assert.ok(Math.abs(height - normal[i][3] * 1.5) < 1e-9);
+      assert.ok(Math.abs(y + height - 89) < 1e-9);
+      assert.ok(x >= 2 - 1e-9 && x + width <= 222 + 1e-9);
+    });
+  }
+});
+
 test('generator writes a real snapshot, reuses cache on failure, and handles no cache', async t => {
   const base = await fs.mkdtemp(path.join(os.tmpdir(), 'pixel-garden-test-'));
   const originalFetch = global.fetch;
