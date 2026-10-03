@@ -81,6 +81,9 @@
 .pg-viewport.is-dragging { cursor: grabbing; }
 .pg-track { display: flex; align-items: flex-start; width: 100%; }
 .pg-panel { flex: 0 0 100%; min-width: 0; }
+/* Reserve exactly the scene and label height while the artwork is unmounted. */
+.pg-panel:empty::before { content: ''; display: block; padding-top: 50%; padding-bottom: 43px; }
+.pixel-garden[data-view="month"] .pg-panel:empty::before { padding-top: 85.7142857%; padding-bottom: 17.5px; }
 .pg-panel[data-season="spring"] { --pg-accent: #698d6a; --pg-soft: #edf5ed; }
 .pg-panel[data-season="summer"] { --pg-accent: #4c8766; --pg-soft: #ebf4ee; }
 .pg-panel[data-season="autumn"] { --pg-accent: #94804d; --pg-soft: #f7f2e8; }
@@ -144,14 +147,17 @@
 .pg-shrub { transform-box: view-box; animation: pg-shrub-wind var(--pg-wind-duration, 5.4s) ease-in-out var(--pg-wind-delay, 0s) infinite; }
 .pg-weather-particle { animation: pg-fall var(--pg-fall-duration, 6s) linear var(--pg-fall-delay, 0s) infinite; }
 .pg-weather-rain { --pg-weather-opacity: .32; }
-.pg-weather-leaves { --pg-weather-opacity: .55; }
+.pg-weather-leaves { --pg-weather-opacity: .65; }
+.pg-leaf-flutter { animation: pg-leaf-flutter var(--pg-flutter-duration, 3s) ease-in-out var(--pg-fall-delay, 0s) infinite; transform-box: fill-box; transform-origin: center; }
 .pg-weather-snow { --pg-weather-opacity: .85; }
 .pg-panel:not([data-visible="true"]) .pg-plant,
 .pg-panel:not([data-visible="true"]) .pg-shrub,
 .pg-panel:not([data-visible="true"]) .pg-weather-particle,
+.pg-panel:not([data-visible="true"]) .pg-leaf-flutter,
 .pixel-garden[data-paused="true"] .pg-plant,
 .pixel-garden[data-paused="true"] .pg-shrub,
-.pixel-garden[data-paused="true"] .pg-weather-particle { animation-play-state: paused; }
+.pixel-garden[data-paused="true"] .pg-weather-particle,
+.pixel-garden[data-paused="true"] .pg-leaf-flutter { animation-play-state: paused; }
 @keyframes pg-wind { 0%, 100% { transform: skewX(-1.5deg); } 45% { transform: skewX(2deg); } 70% { transform: skewX(.5deg); } }
 @keyframes pg-shrub-wind { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
 @keyframes pg-fall {
@@ -159,7 +165,11 @@
   8%, 85% { opacity: var(--pg-weather-opacity, .5); }
   100% { transform: translate(var(--pg-fall-drift, 12px), var(--pg-fall-distance, 124px)); opacity: 0; }
 }
+@keyframes pg-leaf-flutter {
+  0%, 100% { transform: translateX(calc(-1 * var(--pg-flutter-width, 7px))) rotate(-25deg); }
+  50% { transform: translateX(var(--pg-flutter-width, 7px)) rotate(30deg); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .pg-plant, .pg-shrub, .pg-weather-particle { animation: none; }
+  .pg-plant, .pg-shrub, .pg-weather-particle, .pg-leaf-flutter { animation: none; }
 }
 [data-theme="dark"] .pg-panel { --pg-soft: #33362e; --pg-accent: #c2ac7f; }

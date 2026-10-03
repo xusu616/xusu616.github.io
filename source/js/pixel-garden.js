@@ -45,8 +45,15 @@
   }
   function model(state, offset) {
     const today = core.dateKey(new Date(), config.timezone);
+    if (!state.models || state.modelDay !== today) {
+      state.models = new Map();
+      state.modelDay = today;
+    }
+    if (state.models.has(offset)) return state.models.get(offset);
     const anchor = state.mode === 'week' ? core.shiftDate(state.anchor, offset * 7) : core.shiftMonth(state.anchor, offset);
-    return state.mode === 'week' ? core.makeWeek(allContributions(), today, config.hemisphere, anchor) : core.makeMonth(allContributions(), today, config.hemisphere, anchor);
+    const period = state.mode === 'week' ? core.makeWeek(allContributions(), today, config.hemisphere, anchor) : core.makeMonth(allContributions(), today, config.hemisphere, anchor);
+    state.models.set(offset, period);
+    return period;
   }
   function dayButton(day, month) {
     const classes = `pg-day${month ? ' pg-month-day' : ''}${day.today ? ' is-today' : ''}${day.future ? ' is-future' : ''}`;
@@ -54,10 +61,44 @@
     const content = month ? `<span class="pg-month-number">${Number(day.date.slice(8))}</span>` : `<span>${day.label}</span><span class="pg-count">${day.future ? '·' : day.count === null ? '?' : day.count}</span>`;
     return `<button type="button" class="${classes}" data-date="${day.date}" aria-label="${label}" title="${label}"${day.today ? ' aria-current="date"' : ''}>${content}</button>`;
   }
-  function panelHtml(period, mode, offset) {
+  function panelHtml(period, mode) {
     const visual = mode === 'week' ? `<div class="pg-landscape">${core.renderScene(period)}</div><div class="pg-week" role="group" aria-label="Daily contributions">${period.days.map(day => dayButton(day, false)).join('')}</div>` :
       `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period)}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
-    return `<div class="pg-panel" data-offset="${offset}" data-season="${period.season}">${visual}</div>`;
+    return visual;
+  }
+  // Empty shells preserve scroll geometry; only intersecting panels get artwork.
+  function syncPanels(widget) {
+    const state = states.get(widget);
+    const viewport = widget.querySelector('.pg-viewport');
+    const width = viewport.getBoundingClientRect().width;
+    const active = state.inView && !document.hidden && width > 0;
+    widget.dataset.paused = String(!active);
+    viewport.querySelectorAll('.pg-panel').forEach((panel, index) => {
+      const visible = active && index * width < viewport.scrollLeft + width - .5 && (index + 1) * width > viewport.scrollLeft + .5;
+      panel.dataset.visible = String(visible);
+      panel.inert = !visible;
+      if (visible && !panel.hasChildNodes()) {
+        const period = model(state, Number(panel.dataset.offset));
+        panel.dataset.season = period.season;
+        panel.innerHTML = panelHtml(period, state.mode);
+      } else if (!visible && panel.hasChildNodes()) panel.replaceChildren();
+    });
+  }
+  function makeShells(widget, reuse) {
+    const state = states.get(widget);
+    const track = widget.querySelector('.pg-track');
+    const existing = new Map(reuse ? Array.from(track.children, panel => [Number(panel.dataset.offset), panel]) : []);
+    track.replaceChildren(...state.offsets.map(offset => {
+      if (existing.has(offset)) return existing.get(offset);
+      const panel = document.createElement('div');
+      panel.className = 'pg-panel';
+      panel.dataset.offset = offset;
+      panel.inert = true;
+      return panel;
+    }));
+    if (state.models) for (const offset of state.models.keys()) {
+      if (!state.offsets.includes(offset)) state.models.delete(offset);
+    }
   }
   function freshLabel(period) {
     if (!data) return 'Loading GitHub contributions…';
@@ -98,10 +139,7 @@
     widget.querySelector('.pg-now').hidden = period.days.some(day => day.today);
     widget.querySelector('.pg-detail').hidden = !state.detail;
     widget.querySelector('.pg-detail').textContent = state.detail || '';
-    viewport.querySelectorAll('.pg-panel').forEach((panel, panelIndex) => {
-      panel.dataset.visible = String(panelIndex * width < viewport.scrollLeft + width - .5 && (panelIndex + 1) * width > viewport.scrollLeft + .5);
-      panel.inert = panel.dataset.visible !== 'true';
-    });
+    syncPanels(widget);
     if (state.lastPeriod !== period.start) {
       state.lastPeriod = period.start;
       state.detail = '';
@@ -115,7 +153,8 @@
     const left = viewport.scrollLeft;
     widget.dataset.view = state.mode;
     widget.querySelectorAll('.pg-view-button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === state.mode)));
-    viewport.querySelector('.pg-track').innerHTML = state.offsets.map(offset => panelHtml(model(state, offset), state.mode, offset)).join('');
+    state.models = new Map();
+    makeShells(widget, false);
     viewport.scrollLeft = reset ? 3 * viewport.getBoundingClientRect().width : left;
     updateControls(widget);
   }
@@ -137,7 +176,7 @@
       shift = -2 * width;
     }
     if (shift) {
-      viewport.querySelector('.pg-track').innerHTML = state.offsets.map(offset => panelHtml(model(state, offset), state.mode, offset)).join('');
+      makeShells(widget, true);
       viewport.scrollLeft = left + shift;
       if (state.drag) state.drag.left += shift;
     }
@@ -228,9 +267,10 @@
     widget.querySelector('.pg-now').addEventListener('click', () => resetTo(widget, currentDay, state.mode));
     if (typeof IntersectionObserver === 'function') {
       state.visibility = new IntersectionObserver(entries => {
-        widget.dataset.paused = String(!entries[0].isIntersecting);
+        state.inView = entries[0].isIntersecting;
+        syncPanels(widget);
       });
-      state.visibility.observe(widget);
+      state.visibility.observe(viewport);
     }
     if (typeof ResizeObserver === 'function') {
       state.resize = new ResizeObserver(() => {
@@ -325,7 +365,7 @@
         <div class="pg-freshness" role="status"></div>
         <div class="pg-footer"><button type="button" class="pg-now" hidden>Today</button><div class="pg-view-switch" role="group" aria-label="Garden view"><button type="button" class="pg-view-button" data-view="week" aria-pressed="true">Week</button><button type="button" class="pg-view-button" data-view="month" aria-pressed="false">Month</button></div></div>`;
       const savedMode = readStorage('pixel-garden-view');
-      states.set(widget, { mode: savedMode === 'month' ? 'month' : 'week', anchor: currentDay, offsets: [-3, -2, -1, 0, 1, 2, 3], detail: '' });
+      states.set(widget, { mode: savedMode === 'month' ? 'month' : 'week', anchor: currentDay, offsets: [-3, -2, -1, 0, 1, 2, 3], detail: '', inView: typeof IntersectionObserver !== 'function' });
       card.appendChild(widget);
       activeWidget = widget;
       paint(widget, true);
@@ -351,6 +391,9 @@
   if (document.readyState === 'complete') mount();
   else document.addEventListener('DOMContentLoaded', mount, { once: true });
   document.addEventListener('pjax:complete', mount);
-  document.addEventListener('visibilitychange', refreshDay);
+  document.addEventListener('visibilitychange', () => {
+    refreshDay();
+    document.querySelectorAll('.pixel-garden').forEach(syncPanels);
+  });
   setInterval(refreshDay, 60000);
 })();
