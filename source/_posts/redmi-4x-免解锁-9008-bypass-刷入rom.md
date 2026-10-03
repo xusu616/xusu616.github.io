@@ -10,7 +10,7 @@ categories:
 excerpt: 新手机（划掉）旧手机买来之后发现有账号/金凡不给解锁怎么办？直接上雄氏老方9008，解锁不了怎么办？就不解锁直接刷😋😋
 ---
 
-# 首先是尝试*进犯*的妙妙の小工具
+# 首先是尝试_进犯_的妙妙の小工具
 
 结果发现提示请先绑定账号
 
@@ -49,8 +49,8 @@ pdd上11块钱买一套就够用了
 # 考虑对9008干点什么
 
 > 首先当然是去万能的 xda 上找一找\
-你会看到：这个，一个是二进制包（ida查看是加密的）\
-其次就是一个9008的镜像包\
+> 你会看到：这个，一个是二进制包（ida查看是加密的）\
+> 其次就是一个9008的镜像包\
 
 如果要刷入镜像的话，不建议使用任何图形界面，因为它们既低效又容易产生歧义
 
@@ -129,6 +129,8 @@ adb reboot recovery
 
 [ROM 发布目录](https://sourceforge.net/projects/crdroid7-mi8937/files/LOS/)
 
+[仓库：rD227/santoni-recovery-bypass](https://github.com/rD227/santoni-recovery-bypass)
+
  repository path: santoni-recovery-bypass\payloads\RedWolf-santoni-appended.img
 
 # 其他注意事项
@@ -147,4 +149,4 @@ adb reboot recovery
 
 别急，安装可用的sim卡重启即可
 
-*最后就是享受你的新手机 吧，再见！*
+_最后就是享受你的新手机 吧，再见！_
