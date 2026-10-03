@@ -23,7 +23,7 @@
 #aside-content .card-info a.pg-profile { color: var(--pg-muted); font-size: 10px; }
 #aside-content .card-info a.pg-profile:hover { color: var(--pg-accent); }
 .pg-landscape { overflow: hidden; border-radius: 7px; background: var(--pg-soft); }
-.pg-scene { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.pg-scene { display: block; width: 100%; height: auto; overflow: hidden; image-rendering: pixelated; }
 .pg-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin-top: 5px; }
 #aside-content .card-info .pg-day {
   display: flex;
@@ -63,3 +63,103 @@
 @media (prefers-contrast: more) {
   #aside-content .card-info .pixel-garden { --pg-muted: var(--pg-ink); }
 }
+
+/* Both views use the same continuous, non-snapping timeline. */
+.pg-viewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overflow-anchor: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+  cursor: grab;
+  user-select: none;
+}
+.pg-viewport::-webkit-scrollbar { display: none; }
+.pg-viewport:focus-visible { outline: 2px solid var(--pg-accent); outline-offset: 2px; border-radius: 7px; }
+.pg-viewport.is-dragging { cursor: grabbing; }
+.pg-track { display: flex; align-items: flex-start; width: 100%; }
+.pg-panel { flex: 0 0 100%; min-width: 0; }
+.pg-panel[data-season="spring"] { --pg-accent: #698d6a; --pg-soft: #edf5ed; }
+.pg-panel[data-season="summer"] { --pg-accent: #4c8766; --pg-soft: #ebf4ee; }
+.pg-panel[data-season="autumn"] { --pg-accent: #94804d; --pg-soft: #f7f2e8; }
+.pg-panel[data-season="winter"] { --pg-accent: #718d9e; --pg-soft: #edf2f7; }
+#aside-content .card-info .pg-scrollbar {
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 16px;
+  margin: 3px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+  accent-color: var(--pg-accent);
+}
+.pg-scrollbar::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--pg-line); }
+.pg-scrollbar::-moz-range-track { height: 4px; border-radius: 4px; background: var(--pg-line); }
+.pg-scrollbar::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 36px; height: 6px; margin-top: -1px; border: 0; border-radius: 4px; background: var(--pg-accent); }
+.pg-scrollbar::-moz-range-thumb { width: 36px; height: 6px; border: 0; border-radius: 4px; background: var(--pg-accent); }
+.pg-scrollbar:focus-visible { outline: 2px solid var(--pg-accent); outline-offset: 1px; border-radius: 5px; }
+.pg-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 7px; min-height: 25px; }
+.pg-view-switch { display: flex; gap: 2px; padding: 2px; border-radius: 6px; background: var(--pg-soft); margin-left: auto; }
+#aside-content .card-info .pg-view-button, #aside-content .card-info .pg-now {
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 9px;
+  background: transparent;
+  color: var(--pg-muted);
+  font: inherit;
+  font-size: 10px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+#aside-content .card-info .pg-view-button[aria-pressed="true"] { background: var(--pg-accent); color: #fff; }
+#aside-content .card-info .pg-view-button:focus-visible, #aside-content .card-info .pg-now:focus-visible { outline: 2px solid var(--pg-accent); outline-offset: 2px; }
+#aside-content .card-info .pg-now { padding-left: 0; color: var(--pg-accent); }
+#aside-content .card-info .pg-now[hidden], #aside-content .pixel-garden .pg-detail[hidden] { display: none; }
+.pg-month-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; text-align: center; font-size: 9px; color: var(--pg-muted); }
+.pg-month-map { position: relative; overflow: hidden; border-radius: 7px; }
+.pg-month-grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); }
+#aside-content .card-info .pg-month-day {
+  position: relative;
+  display: block;
+  margin: 1px;
+  padding: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: #fdf7eb;
+  cursor: pointer;
+}
+#aside-content .card-info .pg-month-day.is-today,
+#aside-content .card-info .pg-month-day:hover,
+#aside-content .card-info .pg-month-day:focus-visible { background: transparent; color: #fff; box-shadow: inset 0 0 0 1px var(--pg-accent); }
+#aside-content .card-info .pg-month-day.is-future { opacity: .55; }
+.pg-month-number { position: absolute; bottom: 1px; right: 3px; font-size: 8px; line-height: 1.3; text-shadow: 0 1px 1px #665e4d; font-variant-numeric: tabular-nums; }
+
+/* Only the plant moves; soil, dates and hills stay still. */
+.pg-plant { transform-box: view-box; animation: pg-wind var(--pg-wind-duration, 4.8s) ease-in-out var(--pg-wind-delay, 0s) infinite; }
+.pg-shrub { transform-box: view-box; animation: pg-shrub-wind var(--pg-wind-duration, 5.4s) ease-in-out var(--pg-wind-delay, 0s) infinite; }
+.pg-weather-particle { animation: pg-fall var(--pg-fall-duration, 6s) linear var(--pg-fall-delay, 0s) infinite; }
+.pg-weather-rain { --pg-weather-opacity: .32; }
+.pg-weather-leaves { --pg-weather-opacity: .55; }
+.pg-weather-snow { --pg-weather-opacity: .85; }
+.pg-panel:not([data-visible="true"]) .pg-plant,
+.pg-panel:not([data-visible="true"]) .pg-shrub,
+.pg-panel:not([data-visible="true"]) .pg-weather-particle,
+.pixel-garden[data-paused="true"] .pg-plant,
+.pixel-garden[data-paused="true"] .pg-shrub,
+.pixel-garden[data-paused="true"] .pg-weather-particle { animation-play-state: paused; }
+@keyframes pg-wind { 0%, 100% { transform: skewX(-1.5deg); } 45% { transform: skewX(2deg); } 70% { transform: skewX(.5deg); } }
+@keyframes pg-shrub-wind { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes pg-fall {
+  0% { transform: translate(0, 0); opacity: 0; }
+  8%, 85% { opacity: var(--pg-weather-opacity, .5); }
+  100% { transform: translate(var(--pg-fall-drift, 12px), var(--pg-fall-distance, 124px)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-plant, .pg-shrub, .pg-weather-particle { animation: none; }
+}
+[data-theme="dark"] .pg-panel { --pg-soft: #33362e; --pg-accent: #c2ac7f; }
