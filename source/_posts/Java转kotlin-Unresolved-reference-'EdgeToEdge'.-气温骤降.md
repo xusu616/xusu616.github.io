@@ -1,5 +1,5 @@
 ---
-title: Java转kotlin Unresolved reference &#39;EdgeToEdge&#39;. - 气温骤降
+title: Java转Kotlin Unresolved reference &#39;EdgeToEdge&#39;. - 气温骤降
 tags:
   - Android
 date: 2026-03-17 12:18:00
