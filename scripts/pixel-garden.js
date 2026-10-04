@@ -1,4 +1,9 @@
-/* SPDX-License-Identifier: MIT — Copyright (c) 2026 XvSu */
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright (C) 2026 rD227 (XvSu)
+ * This program is free software: you can redistribute it and/or modify it
+ * under the GNU General Public License, version 3 or any later version.
+ * This program is distributed WITHOUT ANY WARRANTY; see the component LICENSE.
+ */
 'use strict';
 
 const fs = require('node:fs/promises');
@@ -30,7 +35,7 @@ function validSnapshot(data, username) {
     data.contributions.every(item => /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isSafeInteger(item.count) && item.count >= 0);
 }
 
-async function generate(hexo) {
+async function generate(hexo, options = {}) {
   const settings = hexo.config.pixel_garden;
   if (!settings || settings.enable === false) return [];
   const username = String(settings.username || '');
@@ -40,21 +45,27 @@ async function generate(hexo) {
   const today = garden.dateKey(new Date(), timezone);
   const cachePath = path.join(hexo.base_dir, '.cache', 'pixel-garden', `${username}.json`);
   let snapshot = { username, updatedAt: null, source: 'github', contributions: [], unavailable: true };
-  try {
-    const response = await fetch(`https://github.com/users/${encodeURIComponent(username)}/contributions`, {
-      headers: { 'Accept-Language': 'en', 'User-Agent': 'Hexo-Pixel-Garden' },
-      signal: AbortSignal.timeout(12000)
-    });
-    if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
-    snapshot = { username, updatedAt: new Date().toISOString(), source: 'github', contributions: parseCalendar(await response.text()) };
-  } catch (error) {
-    hexo.log.warn(`[pixel-garden] ${error.message}; using cache if available`);
+  // Standalone builds can supply an offline snapshot without requesting GitHub.
+  if (options.snapshot !== undefined) {
+    if (!validSnapshot(options.snapshot, username)) throw new Error('Invalid contribution snapshot');
+    snapshot = options.snapshot;
+  } else {
     try {
-      const cached = JSON.parse(await fs.readFile(cachePath, 'utf8'));
-      if (validSnapshot(cached, username)) snapshot = { ...cached, stale: true };
-    } catch (_) { /* The widget explicitly labels unavailable data. */ }
+      const response = await fetch(`https://github.com/users/${encodeURIComponent(username)}/contributions`, {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'Hexo-Pixel-Garden' },
+        signal: AbortSignal.timeout(12000)
+      });
+      if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+      snapshot = { username, updatedAt: new Date().toISOString(), source: 'github', contributions: parseCalendar(await response.text()) };
+    } catch (error) {
+      hexo.log.warn(`[pixel-garden] ${error.message}; using cache if available`);
+      try {
+        const cached = JSON.parse(await fs.readFile(cachePath, 'utf8'));
+        if (validSnapshot(cached, username)) snapshot = { ...cached, stale: true };
+      } catch (_) { /* The widget explicitly labels unavailable data. */ }
+    }
   }
-  if (!snapshot.unavailable && !snapshot.stale) {
+  if (options.snapshot === undefined && !snapshot.unavailable && !snapshot.stale) {
     try {
       await fs.mkdir(path.dirname(cachePath), { recursive: true });
       await fs.writeFile(cachePath, JSON.stringify(snapshot));

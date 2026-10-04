@@ -1,4 +1,9 @@
-/* SPDX-License-Identifier: MIT — Copyright (c) 2026 XvSu */
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright (C) 2026 rD227 (XvSu)
+ * This program is free software: you can redistribute it and/or modify it
+ * under the GNU General Public License, version 3 or any later version.
+ * This program is distributed WITHOUT ANY WARRANTY; see the component LICENSE.
+ */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.PixelGarden = factory();
