@@ -1,10 +1,17 @@
-/* SPDX-License-Identifier: MIT — Copyright (c) 2026 XvSu */
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright (C) 2026 rD227 (XvSu)
+ * This program is free software: you can redistribute it and/or modify it
+ * under the GNU General Public License, version 3 or any later version.
+ * This program is distributed WITHOUT ANY WARRANTY; see the component LICENSE.
+ */
 (function () {
   'use strict';
   const core = window.PixelGarden;
   if (!core) return;
   const script = document.currentScript;
   const configUrl = script && script.dataset.config || '/garden/config.json';
+  // An explicit target makes the same component usable without a blog theme.
+  const targetSelector = script && script.dataset.target;
   const CACHE_TTL = 60 * 60 * 1000;
   // Side-view plants in the avatar card, on desktop and mobile. Main view uses 1.
   const SIDEBAR_WEEKLY_PLANT_SCALE = 2;
@@ -354,6 +361,7 @@
     return recent ? { parent: recent, before: recent.firstElementChild } : null;
   }
   function placeGarden(widget, reveal) {
+    if (targetSelector) return;
     const card = document.querySelector('#aside-content .card-info');
     const main = desktop.matches && preferredPosition === 'main' && mainLocation();
     const placement = main ? 'main' : 'sidebar';
@@ -384,6 +392,7 @@
     if (reveal) widget.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   function installPositionButton(widget) {
+    if (targetSelector) return;
     const menu = document.querySelector('#rightside-config-hide');
     if (!menu || document.querySelector('#pixel-garden-position')) return;
     const button = document.createElement('button');
@@ -401,7 +410,7 @@
     placeGarden(widget);
   }
   async function mount() {
-    const card = document.querySelector('#aside-content .card-info');
+    const card = document.querySelector(targetSelector || '#aside-content .card-info');
     if (!card) return;
     if (activeWidget && !activeWidget.isConnected) {
       const previous = states.get(activeWidget);
@@ -423,6 +432,7 @@
       const widget = document.createElement('section');
       widget.id = 'pixel-garden';
       widget.className = 'pixel-garden';
+      widget.dataset.placement = targetSelector ? 'main' : 'sidebar';
       widget.setAttribute('aria-label', 'GitHub pixel garden');
       widget.innerHTML = `
         <div class="pg-heading"><span class="pg-title"><span class="pg-leaf" aria-hidden="true"></span><span class="pg-title-text"></span></span><span class="pg-season"></span></div>
