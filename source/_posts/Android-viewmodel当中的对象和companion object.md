@@ -6,6 +6,7 @@ tags:
   - Kotlin
 categories:
   - Android
+  - Kotlin
 excerpt: 内联修饰词可能造成泄漏，在不同的viewmodel持有不同数据时可以抽离出单例对象作为小项目传递
 ---
 

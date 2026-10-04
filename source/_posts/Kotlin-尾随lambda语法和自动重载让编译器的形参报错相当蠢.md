@@ -6,6 +6,7 @@ tags:
   - Kotlin
 categories:
   - Kotlin
+  - 语言特性
 excerpt: 乱搓的函数匹配全部报告一遍就离谱，不知道怎么说了
 ---
 

@@ -6,6 +6,7 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
+  - STM32
 excerpt: TIM 定时器分频（不过其实也没什么可记的（（
 ---
 

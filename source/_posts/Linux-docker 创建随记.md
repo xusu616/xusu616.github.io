@@ -6,6 +6,7 @@ tags:
   - docker
 categories:
   - Linux
+  - Docker
 excerpt: 下载到部署docker，为了放ds的harness进去（这里用得wsl演示（） ~~（我之前没有用过这么自动化的（（（啊这个这个（（总之就是比cc之类的还要持久（（但是给cc接入gpt-sol-5.6那种api还是很离谱的~~
 ---
 

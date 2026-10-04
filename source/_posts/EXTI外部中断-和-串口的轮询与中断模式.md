@@ -6,6 +6,7 @@ tags:
   - STM32
 categories:
   - 嵌入式
+  - STM32
 excerpt: EXTI 外部中断、串口轮询模式和中断模式的相关知识，顺便讲讲为什么串口中断要走回调
 ---
 

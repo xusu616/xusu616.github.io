@@ -6,6 +6,7 @@ tags:
   - STM32
 categories:
   - 嵌入式
+  - STM32
 excerpt: 按键外部中断乱闪的两个原因（悬空引脚、抖动沿被 pending 锁存），以及为什么中断里不该用 HAL_Delay
 ---
 

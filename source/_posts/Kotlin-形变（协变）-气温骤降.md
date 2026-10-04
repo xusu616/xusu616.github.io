@@ -6,6 +6,7 @@ date: 2026-04-23 03:27:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19914163
 categories:
     - Kotlin
+    - 语言特性
 ---
 
 协变 （variance） out 关键字 public interface StateFlow<out T> : SharedFlow<T> { /** * The current value of this state flow. */ public val value: T } 此函数用于读取流的值，不需要异步地 collect 在这里用out声明后，可以向上转型 类可以默认向上转型，但是泛型不行，因为这不是继承关系，而是多个类关系 in 关键字 逆变 (Contravariance) interface Consumer<in T> { fun consume(item: T)...

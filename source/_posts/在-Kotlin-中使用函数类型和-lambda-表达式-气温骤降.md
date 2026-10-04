@@ -8,6 +8,7 @@ date: 2026-03-18 16:22:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19736180
 categories:
     - Kotlin
+    - 语言特性
 ---
 
 函数类型 不能写val functionCall = func()这回调用函数并执行得到返回值 写val functionCall = ::func lambda 点击查看语法格式 将函数作为数据类型 如果你没有指定返回值，编译器会自动默认它返回 Unit 在 Kotlin 中，每一个函数都必须返回某个东西。如果你没有指定返回值，编译器会自动默认它返回 Unit 写(): () -> /type/相当于指定函数返回值类型了 各种写法演示 fun main() { val testCallFunction = ::test testCallFunction() val...

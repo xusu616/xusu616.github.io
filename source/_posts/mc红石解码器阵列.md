@@ -5,6 +5,7 @@ tags:
   - 数电
 categories:
   - 数电
+  - Minecraft红石电路
 excerpt: 使用满五减三阵列实现移位操作
 ---
 

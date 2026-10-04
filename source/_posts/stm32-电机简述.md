@@ -6,6 +6,7 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
+  - STM32
 excerpt: 以drv8833为例说明其控制
 ---
 

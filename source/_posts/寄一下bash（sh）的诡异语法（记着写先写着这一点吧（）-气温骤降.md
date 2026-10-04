@@ -8,6 +8,7 @@ date: 2026-03-24 07:32:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19764325
 categories:
     - Linux
+    - Shell与脚本
 ---
 
 正开始反结束 if开始fi结束 case开始esac结束 单分号和双分号 Linux允许压行写（所有语句写一行） 行与行用‘;’分割 双分号可以用于case的一个分支结束

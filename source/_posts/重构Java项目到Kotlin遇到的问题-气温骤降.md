@@ -8,6 +8,7 @@ date: 2026-03-19 02:39:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19737643
 categories:
     - Kotlin
+    - 项目迁移
 ---
 
 防止我忘了吧~ 1.错误: 无法从最终MainTabsActivity进行继承 因为Java是默认可以继承的，而Kotlin不行，所以Kotlin要加open 也可以说Java的类默认open，Kotlin默认final 2.错误: 方法不会覆盖或实现超类型的方法 某些方法不正常，需要open，重写 override fun onCreateOptionsMenu(menu: Menu?): Boolean { return super.onCreateOptionsMenu(menu) } 3. 转Compose之后放弃了xml，放弃了对layout的引用...
