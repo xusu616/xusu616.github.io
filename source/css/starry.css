@@ -74,6 +74,9 @@ html[data-darkreader-scheme="dark"] .animated-bg {
   100% { transform: translate3d(2%, -3%, 0) scale(1.03); }
 }
 /* ── Pixel Cat (from Oyama-s-HRT-Tracker) ─────────────────── */
+html[data-theme="light"] { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+
 :root {
   --pixel-blue: #9FD4EE;
   --pixel-pink: #F6BFCE;
@@ -213,6 +216,8 @@ html[data-darkreader-scheme="dark"] .animated-bg {
   line-height: 0;
 }
 .pixel-cat-svg {
+  /* Preserve the sprite palette when a browser forces dark colors. */
+  color-scheme: only light;
   max-width: 100%;
   height: auto;
   display: block;
