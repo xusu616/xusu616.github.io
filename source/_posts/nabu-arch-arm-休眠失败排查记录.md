@@ -35,7 +35,7 @@ excerpt: 刷刷刷
 | 画面恢复，但触摸无反应 | 触摸固件下载、驱动绑定和实际触摸响应 | 要结合前两种情况判断 |
 | 关机或重新启动 | logind、关机服务、内核末尾日志、pstore | 不能仅凭触摸报错判断原因 |
 
-我之前把一些黑屏也叫作“休眠后自动关机”，但 SSH 还连得上、桌面进程还活着的时候，系统其实可能根本没有关机。先确认是哪条路径出了问题，后面的日志才有意义。
+我之前把一些黑屏也叫作“休眠后自动关机”，但 SSH 还连得上、桌面进程还活着的时候，系统其实可能根本没有关机。先确认是哪条路径出了问题，后面的日志才有意义
 
 ## 排除：查看上一次启动的日志
 
@@ -52,9 +52,9 @@ journalctl -b -1 -p 3 -n 233 --no-pager
 ```
 
 - `-b -1`：上一次启动。只有故障确实发生在上一次启动时，它才对应故障现场。
-- `-p 3`：Error，以及比 Error 更严重的日志。
+- `-p 3`：Error，以及比 Error 更严重的日志
 - `-n 233`：最多显示最近 233 条符合条件的日志；想看更多，可以改成 `-n 9178`。
-- `--no-pager`：直接输出，方便复制和保存。
+- `--no-pager`：直接输出，方便复制和保存
 
 这里 `-b -1` 写一次就够了。要保留完整上下文，还需要看未过滤严重程度的内核和休眠服务日志：
 
@@ -63,7 +63,7 @@ journalctl -k -b -1 --no-pager
 journalctl -b -1 -u systemd-suspend.service -u nabu-touch-resume.service --no-pager
 ```
 
-如果机器已经重启过好几次，先从 `--list-boots` 找到那次启动的 ID，再用 `journalctl -b <启动ID>`，避免把另一次启动当作故障现场。
+如果机器已经重启过好几次，先从 `--list-boots` 找到那次启动的 ID，再用 `journalctl -b <启动ID>`，避免把另一次启动当作故障现场
 
 要在当前启动中实时观察，可以提前开一个 SSH 终端：
 
@@ -71,7 +71,7 @@ journalctl -b -1 -u systemd-suspend.service -u nabu-touch-resume.service --no-pa
 sudo journalctl -k -b -f -o short-precise
 ```
 
-`sudo dmesg -w` 也能持续观察内核消息；重启前后的对照以持久保存的 journal 更方便。真正进入系统休眠期间，SSH 会暂时没有响应，这本身不能说明崩溃。
+`sudo dmesg -w` 也能持续观察内核消息；重启前后的对照以持久保存的 journal 更方便。真正进入系统休眠期间，SSH 会暂时没有响应，这本身不能说明崩溃
 
 ### 日志里出现了什么
 
@@ -92,9 +92,9 @@ Mar 23 12:07:54 alarm kernel: [NVT-ts-spi] nvt_get_fw_info 639: fw_ver = 0x35, f
 
 </details>
 
-`nvt_ts_suspend` 和 `nvt_ts_resume` 说明触摸驱动进入过自己的休眠、恢复流程。它们也可能由显示熄屏、亮屏通知触发，因此不能单靠这两个函数名证明整机进入过休眠。
+`nvt_ts_suspend` 和 `nvt_ts_resume` 说明触摸驱动进入过自己的休眠、恢复流程。它们也可能由显示熄屏、亮屏通知触发，因此不能单靠这两个函数名证明整机进入过休眠
 
-`nvt_check_fw_reset_state` 报错表示恢复过程中没有读到预期的固件复位状态。后面即使又出现固件下载成功，也还要看后续是否继续报错，以及手指是否真的能操作。这个片段足以提示触摸恢复异常，但不足以证明它导致了整机自动关机。
+`nvt_check_fw_reset_state` 报错表示恢复过程中没有读到预期的固件复位状态。后面即使又出现固件下载成功，也还要看后续是否继续报错，以及手指是否真的能操作。这个片段足以提示触摸恢复异常，但不足以证明它导致了整机自动关机
 
 ## 尝试解决：找到真正的模块名和驱动路径
 
@@ -135,11 +135,11 @@ zcat /proc/config.gz | rg 'CONFIG_TOUCHSCREEN_NT36523_SPI'
 CONFIG_TOUCHSCREEN_NT36523_SPI=m
 ```
 
-所以我原先猜“触摸驱动编译进了内核”并不准确。`=m` 表示模块；对应配置为 `=y` 才表示编译进内核。本机的面板配置 `CONFIG_DRM_PANEL_NOVATEK_NT36523=y` 容易和触摸配置混淆。
+[所以我原先猜“触摸驱动编译进了内核” （在这里） 并不准确。](https://rd227.github.io/2026/03/23/Xiaomi-pad-5\(nabu\)%EF%BC%88%E6%88%96%E8%80%85%E5%85%B6%E4%BB%96Linux-arm%E8%AE%BE%E5%A4%87%EF%BC%9F%EF%BC%89%E5%B1%8F%E5%B9%95%E4%BC%91%E7%9C%A0%E6%97%B6Kernel-panic%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95-%E6%B0%94%E6%B8%A9%E9%AA%A4%E9%99%8D/)`=m` 表示模块；对应配置为 `=y` 才表示编译进内核。本机的面板配置 `CONFIG_DRM_PANEL_NOVATEK_NT36523=y` 容易和触摸配置混淆
 
-模块可以通过 `modprobe -r nt36523_ts` 和 `modprobe nt36523_ts` 卸载、加载。不过这次沿用了针对 `spi0.0` 的解绑、重绑方案，并没有改成整个模块反复卸载。即使是可加载模块，也可以用 sysfs 解绑设备。
+模块可以通过 `modprobe -r nt36523_ts` 和 `modprobe nt36523_ts` 卸载、加载。不过这次沿用了针对 `spi0.0` 的解绑、重绑方案，并没有改成整个模块反复卸载。即使是可加载模块，也可以用 sysfs 解绑设备
 
-驱动路径必须以机器上的实际输出为准。这里是区分大小写的 `NVT-ts-spi`，不能照着示例写成 `nvt_ts_spi`。
+驱动路径必须以机器上的实际输出为准。这里是区分大小写的 `NVT-ts-spi`，不能照着示例写成 `nvt_ts_spi`
 
 ## 原来的钩子为什么有时没用
 
@@ -178,11 +178,11 @@ esac
 | 09:47:13.235 | `user.slice` 才解冻，桌面恢复运行 |
 | 09:47:13.446 | 驱动报告 `Touch is already resume`，提前退出恢复 |
 
-系统已经醒了，触摸却在桌面解冻前初始化失败。后来确认屏幕已经上电，再重新绑定一次，固件下载成功，实际触摸也恢复了。
+系统已经醒了，触摸却在桌面解冻前初始化失败。后来确认屏幕已经上电，再重新绑定一次，固件下载成功，实际触摸也恢复了
 
-[systemd 官方说明](https://github.com/systemd/systemd/blob/main/man/systemd-suspend.service.xml)写明：运行 system-sleep 钩子期间，`user.slice` 默认仍被冻结，各钩子还会并行执行。因此不能在 post 钩子里同步等待 KWin 回应亮屏；给脚本加 `99-` 前缀也不能保证它在其他钩子之后执行。
+[systemd 官方说明](https://github.com/systemd/systemd/blob/main/man/systemd-suspend.service.xml)写明：运行 system-sleep 钩子期间，`user.slice` 默认仍被冻结，各钩子还会并行执行。因此不能在 post 钩子里同步等待 KWin 回应亮屏；给脚本加 `99-` 前缀也不能保证它在其他钩子之后执行
 
-对照的 [Nabu 6.14.11 触摸驱动源码](https://github.com/SeimoDev/linux-xiaomi-nabu/blob/nabu/6.14.11/drivers/input/touchscreen/nt36523/nt36xxx.c)也支持这个解释：部分固件初始化失败不会让整个 probe 失败，恢复函数又可能因为内部 awake 状态提前返回。不过本机内核的精确提交源码没有取得，这里结合的是兼容分支、现场日志和重绑后的实际结果，不能据此断言所有黑屏都来自同一个原因。
+对照的 [Nabu 6.14.11 触摸驱动源码](https://github.com/SeimoDev/linux-xiaomi-nabu/blob/nabu/6.14.11/drivers/input/touchscreen/nt36523/nt36xxx.c)也支持这个解释：部分固件初始化失败不会让整个 probe 失败，恢复函数又可能因为内部 awake 状态提前返回。不过本机内核的精确提交源码没有取得，这里结合的是兼容分支、现场日志和重绑后的实际结果，不能据此断言所有黑屏都来自同一个原因
 
 ## 当前修复：把恢复放到休眠服务结束之后
 
@@ -204,11 +204,11 @@ systemd 解冻桌面，结束系统休眠服务
 成功后删除标记；失败时保留标记并报告错误
 ```
 
-这次改善的关键是恢复顺序，以及对绑定结果的检查。Python 用来执行这些检查和处理超时，systemd 负责把它安排在系统休眠服务之后。
+这次改善的关键是恢复顺序，以及对绑定结果的检查。Python 用来执行这些检查和处理超时，systemd 负责把它安排在系统休眠服务之后
 
 ### 安装前保存旧文件
 
-下面记录的是当前机器已经安装的方案。移植到其他机器时，需要先核对 SPI、DRM、背光路径和桌面环境；本机已经部署，不需要重复安装。
+下面记录的是当前机器已经安装的方案。移植到其他机器时，需要先核对 SPI、DRM、背光路径和桌面环境；本机已经部署，不需要重复安装
 
 依赖包括 `python3`、`kscreen-doctor`、`runuser` 和 systemd 的命令行工具。保存已有文件：
 
@@ -229,7 +229,7 @@ done
 
 ### 一、睡眠钩子
 
-文件位置：`/usr/lib/systemd/system-sleep/99-nabu-touch-fix.sh`。
+文件位置：`/usr/lib/systemd/system-sleep/99-nabu-touch-fix.sh`
 
 ```bash
 sudoedit /usr/lib/systemd/system-sleep/99-nabu-touch-fix.sh
@@ -283,11 +283,11 @@ case ${1:-} in
 esac
 ```
 
-只有 pre 解绑成功，才会创建 `/run/nabu-touch-fix-unbound`。post 只用 `--no-block` 排队，避免阻塞钩子、等不到后面的恢复服务。
+只有 pre 解绑成功，才会创建 `/run/nabu-touch-fix-unbound`。post 只用 `--no-block` 排队，避免阻塞钩子、等不到后面的恢复服务
 
 ### 二、恢复服务
 
-文件位置：`/etc/systemd/system/nabu-touch-resume.service`。
+文件位置：`/etc/systemd/system/nabu-touch-resume.service`
 
 ```bash
 sudoedit /etc/systemd/system/nabu-touch-resume.service
@@ -308,18 +308,18 @@ TimeoutStartSec=45
 UMask=0077
 ```
 
-`After=` 让恢复服务在相应系统休眠服务完成后执行。`ConditionPathExists=` 保证没有待恢复标记时不会操作设备。它是 `oneshot` 服务，执行完就退出，由 post 钩子启动，不需要 `enable`。
+`After=` 让恢复服务在相应系统休眠服务完成后执行。`ConditionPathExists=` 保证没有待恢复标记时不会操作设备。它是 `oneshot` 服务，执行完就退出，由 post 钩子启动，不需要 `enable`
 
 ### 三、Python 恢复脚本
 
-文件位置：`/usr/local/libexec/nabu-touch-resume`。
+文件位置：`/usr/local/libexec/nabu-touch-resume`
 
 ```bash
 sudo install -d -m 755 /usr/local/libexec
 sudoedit /usr/local/libexec/nabu-touch-resume
 ```
 
-这个脚本会找到当前活动的 Wayland 桌面，在需要时请求亮屏；等 DRM 和背光状态稳定后才绑定触摸，并检查本次新产生的固件下载日志。
+这个脚本会找到当前活动的 Wayland 桌面，在需要时请求亮屏；等 DRM 和背光状态稳定后才绑定触摸，并检查本次新产生的固件下载日志
 
 <details>
 <summary>展开完整 Python 脚本</summary>
@@ -447,7 +447,7 @@ if __name__ == '__main__':
 
 </details>
 
-这里把 DRM 的 `On`、连接器启用和背光上电作为初始化前的条件。它们不能证明物理屏幕一定显示正常，也不能替代手指触摸测试，但可以避免已经知道的“屏幕还没准备好就初始化触摸”。
+这里把 DRM 的 `On`、连接器启用和背光上电作为初始化前的条件。它们不能证明物理屏幕一定显示正常，也不能替代手指触摸测试，但可以避免已经知道的“屏幕还没准备好就初始化触摸”
 
 ### 四、设置权限并重新加载服务
 
