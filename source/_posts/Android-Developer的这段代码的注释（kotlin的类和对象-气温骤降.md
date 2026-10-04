@@ -1,5 +1,5 @@
 ---
-title: Android Developer的这段代码的注释（kotlin的类和对象 - 气温骤降
+title: Android Developer的这段代码的注释（Kotlin的类和对象 - 气温骤降
 tags:
   - Android
   - Kotlin

@@ -1,5 +1,5 @@
 ---
-title: Kotlin-让kotlin的类之间的关系稍微好理解一点？
+title: Kotlin-让Kotlin的类之间的关系稍微好理解一点？
 date: 2026-08-20 12:00:00
 tags:
   - Kotlin

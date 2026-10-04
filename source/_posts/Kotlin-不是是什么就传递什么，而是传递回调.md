@@ -1,11 +1,11 @@
 ---
-title: kotlin-不是是什么就传递什么，而是传递回调
+title: Kotlin-不是是什么就传递什么，而是传递回调
 date: 2026-08-25 12:14:00
 tags:
   - Android
-  - kotlin
+  - Kotlin
 categories:
-  - kotlin
+  - Kotlin
   - Android架构
 excerpt: 传递的形参不应该强行修改之后再传回去，没必要使用可变对象之类的东西 ~~可是我不熟悉回调到处传的模式~~
 ---
