@@ -6,6 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
+  - Android UI
 excerpt: 写 Switch Row 组件时纠结要不要在里面写 if 判断，结论是要用状态提升
 ---
 

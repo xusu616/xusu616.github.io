@@ -7,6 +7,7 @@ date: 2026-04-18 03:29:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19887264
 categories:
     - Kotlin
+    - 语言特性
 ---
 
 干嘛 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings") 属性对应的 get()（与 set()）会被委托给它（后面被委托的那个东西）的 getValue() 与 setValue() 方法 警告 Kotlin 不允许在局部作用域定义这种扩展属性委托，也就是说 （拓展属性必须定义在这些地方，它可以拓展 量 的属性） 因为 写 val Context.dataStore 时，Kotlin 编译器在底层其实生成了一个类似 public static...

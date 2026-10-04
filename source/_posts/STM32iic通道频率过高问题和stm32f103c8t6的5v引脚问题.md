@@ -6,6 +6,7 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
+  - STM32
 excerpt: 随便记两个小问题
 ---
 

@@ -7,6 +7,7 @@ date: 2026-04-06 10:29:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19825804
 categories:
     - Kotlin
+    - 语言特性
 ---
 
 接口可以自动推断内部类 if (StringUtils.isNotEmpty(prefsBean.getPassword()) || prefsBean.isAnonymousLogin()) { final AndroidPrefsUserManager userManager = new AndroidPrefsUserManager(prefsBean); //这是一个匿名内部类，没有new，由lambda自动推断 sshServer.setPasswordAuthenticator((username, password, session) -> {...

@@ -8,6 +8,7 @@ date: 2026-03-18 12:11:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19735555
 categories:
     - Android
+    - Kotlin
 ---
 
 这段代码感觉很清晰，可以理一下，看项目应该会看得更懂（？ package com.github.rd227.helloworld import kotlin.properties.ReadWriteProperty import kotlin.reflect.KProperty open class SmartDevice(val name: String, val category: String) { var deviceStatus = "online" protected set open val deviceType = "unknown" open fun turnOn()...

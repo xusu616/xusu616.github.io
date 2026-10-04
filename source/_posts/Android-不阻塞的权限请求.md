@@ -6,6 +6,7 @@ tags:
   - Kotlin
 categories:
   - Kotlin
+  - 语言特性
 excerpt: 根据源码看ui层的权限请求是如何不阻塞得到的，如何与下层交互
 ---
 

@@ -7,6 +7,7 @@ tags:
   - 构建
 categories:
   - Android
+  - 构建工具
 excerpt: 构建报 C:\.android 权限不足，残留的 daemon 里 user.home 不对（红温了让ai写得了~~我要去吃大白饭了~~（讲得有点深的地方直接不管就行
 ---
 

@@ -3,7 +3,9 @@ title: Android正在变得越来越封闭，请向Android抗议，恳请不要�
 date: 2026-03-20 08:30:00
 tags:
   - Android
-categories: []
+categories:
+  - Android
+  - Android生态
 excerpt: Android如果不开放了，那我们就没有使用Android的必要
 ---
 

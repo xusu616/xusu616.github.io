@@ -6,6 +6,7 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
+  - STM32
 excerpt: TIM 除了上次的直接的内部时钟源（来自apb1或者apb2）还有很多其他的时钟源头可供选择
 ---
 

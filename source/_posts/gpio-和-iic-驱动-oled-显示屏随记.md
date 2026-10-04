@@ -6,6 +6,7 @@ tags:
   - stm32
 categories:
   - 嵌入式
+  - STM32
 excerpt: GPIO 和 iic 驱动的区别
 ---
 

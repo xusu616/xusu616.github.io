@@ -6,6 +6,7 @@ date: 2026-05-02 03:28:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19965982
 categories:
     - Linux
+    - 设备维护
 ---
 
 【请点击阅读全文】 我重装系统也会出现这种问题，我确信是软件包问题 我已向 kde 发起（参与）错误报告： https://bugs.kde.org/show_bug.cgi?id=519874 现在你可以去看GitHub fcitx5的仓库的issue https://github.com/fcitx/fcitx5/issues/1573#issue-4558411007 解决办法在那里了，我直接复制过来 解决办法 升级后会遇到崩溃问题 请 sudo mv...

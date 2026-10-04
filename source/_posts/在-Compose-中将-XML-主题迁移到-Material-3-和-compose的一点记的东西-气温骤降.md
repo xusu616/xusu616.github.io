@@ -8,6 +8,7 @@ date: 2026-03-19 16:43:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19741243
 categories:
     - Android
+    - Kotlin
 ---
 
 查看原有的xml 根据xml原有的信息确定形状大小等等 字符串等资源可按原样重复使用，无需迁移 迁移配色（例） <shape android:shape="rectangle"> <corners android:radius="16dp" /> </shape> import androidx.compose.foundation.shape.RoundedCornerShape import androidx.compose.material3.Shapes import androidx.compose.ui.unit.dp val AppShapes = Shapes( //...

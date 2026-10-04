@@ -6,6 +6,7 @@ tags:
   - 数电
 categories:
   - 嵌入式
+  - 数字电路基础
 excerpt: GPIO内部结构
 ---
 

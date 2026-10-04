@@ -6,6 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
+  - 语言特性
 excerpt: 尝试去更好（？地理解Kotlin的语法糖
 ---
 

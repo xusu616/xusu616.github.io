@@ -7,6 +7,7 @@ tags:
   - VSCode
 categories:
   - 嵌入式
+  - STM32
 excerpt: STM32CubeMX 工程在 VSCode 里用 clangd，打开 HAL 头文件报 unknown type name 'HAL_StatusTypeDef' 的解决办法，以及它和 HAL_delay 拼写错误的区别
 ---
 

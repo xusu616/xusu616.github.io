@@ -6,6 +6,7 @@ tags:
   - docker
 categories:
   - Linux
+  - Docker
 excerpt: 让ai写了脚本然后我发现每次挂载需要rm，上网找到了解决办法，顺带一个该办法的自动挂载脚本
 ---
 

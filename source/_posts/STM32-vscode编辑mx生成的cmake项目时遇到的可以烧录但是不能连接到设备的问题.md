@@ -6,6 +6,7 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
+  - STM32
 excerpt: 使用vsc烧录cmake管理的stm32项目时遇到的问题排查方法
 ---
 

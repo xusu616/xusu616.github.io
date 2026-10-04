@@ -6,6 +6,7 @@ tags:
   - 网络
 categories:
   - Linux
+  - 网络与代理
 excerpt: pacman 下载 403 或超时，往往不是环境变量问题，而是 VPN 的 TUN 模式在网络层劫持了国内镜像流量 做个记录
 ---
 

@@ -6,6 +6,7 @@ tags:
   - Kotlin
 categories:
   - Kotlin
+  - 语言特性
 excerpt: 感觉到一种方法，可以一层一层地看Kotlin，比如请求权限这个行为，可以放在主方法的地方
 ---
 

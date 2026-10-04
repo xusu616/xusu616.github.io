@@ -5,6 +5,7 @@ tags:
   - 数电
 categories:
   - 数电
+  - Minecraft红石电路
 excerpt: 在MC当中如何对高位的二进制输出转换为十进制输出，无需复杂穷举编码，即满五加三算法
 ---
 
