@@ -310,7 +310,7 @@ aside:
   card_categories:
     enable: true
     # If set 0 will show all
-    limit: 0
+    limit: 12
     # Choose: none / true / false
     expand: none
     sort_order:
