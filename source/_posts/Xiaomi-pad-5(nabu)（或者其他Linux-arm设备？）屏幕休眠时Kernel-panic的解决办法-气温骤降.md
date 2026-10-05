@@ -1,6 +1,7 @@
 ---
 title: Xiaomi pad 5(nabu)（或者其他Linux arm设备？）屏幕休眠时Kernel panic的解决办法 - 气温骤降
 date: 2026-03-24 07:12:00
+permalink: 2026/03/23/Xiaomi-pad-5(nabu)（或者其他Linux-arm设备？）屏幕休眠时Kernel-panic的解决办法-气温骤降/
 tags:
   - 刷机
   - Android架构和安全
