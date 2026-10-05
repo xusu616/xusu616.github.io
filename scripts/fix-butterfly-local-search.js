@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Butterfly 5.5 initializes local search on window.load. A slow third-party
-// request (for example Busuanzi JSONP) can keep that event pending and leave
+// request can keep that event pending and leave
 // the search button without its click handler. Initialize once the DOM is
 // ready instead, without modifying the Butterfly submodule.
 hexo.extend.filter.register('after_generate', () => {
