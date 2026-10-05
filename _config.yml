@@ -115,3 +115,9 @@ pixel_garden:
   #type: git
   #repository: git@github.com:rD227/rD227.github.io.git
   #branch: main
+# Local search index
+search:
+  path: search.json
+  field: post
+  content: true
+  format: striptags

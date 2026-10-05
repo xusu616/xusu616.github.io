@@ -38,7 +38,7 @@ excerpt: 没怎么用过好的直接被的被6.1sol和Astra吓得震惊瘫坐了
 
 修了博客其它问题，加了加载动画（（
 
-给locationSpoofer适配了[Android 11](https://github.com/rD227/LocationSpoofer)
+给[locationSpoofer适配了Android 11](https://github.com/rD227/LocationSpoofer)
 
 修了一下有线校园网的路由（等我把这个弄明白
 
