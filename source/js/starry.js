@@ -8,6 +8,21 @@
   var giantColor = "180,184,240";
   var starColor = "30,144,255";
   var cometColor = "226,225,224";
+  var html = document.documentElement;
+  var systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+  var storageKey = 'starry-mode';
+  var mode = null;
+  var visible = false;
+  var animationFrame = null;
+  var toggleButton;
+
+  // 未手动选择时跟随暗色模式；手动选择优先于所有暗色模式来源。
+  try {
+    var savedMode = localStorage.getItem(storageKey);
+    if (savedMode === 'on' || savedMode === 'off') mode = savedMode;
+  } catch (error) {
+    // 禁用存储时仍可在当前页面切换。
+  }
 
   function resize() {
     width = window.innerWidth;
@@ -138,11 +153,10 @@
 
   // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 插件
   function isDarkMode() {
-    var html = document.documentElement;
     // Butterfly 主题按钮
     if (html.getAttribute('data-theme') === 'dark') return true;
     // 系统暗色模式
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    if (systemDarkMode.matches) return true;
     // Dark Reader: 仅夜间模式 (scheme=dark)，排除日间模式 (scheme=dimmed)
     if (html.dataset.darkreaderScheme === 'dark') return true;
     return false;
@@ -155,18 +169,69 @@
   window.addEventListener("resize", resize, false);
 
   function render() {
-    if (isDarkMode()) {
-      ctx.clearRect(0, 0, width, height);
-      for (var i = 0; i < stars.length; i++) {
-        stars[i].move();
-        stars[i].fadeIn();
-        stars[i].fadeOut();
-        stars[i].twinkle();
-        stars[i].draw();
-      }
+    ctx.clearRect(0, 0, width, height);
+    for (var i = 0; i < stars.length; i++) {
+      stars[i].move();
+      stars[i].fadeIn();
+      stars[i].fadeOut();
+      stars[i].twinkle();
+      stars[i].draw();
     }
-    window.requestAnimationFrame(render);
+    animationFrame = window.requestAnimationFrame(render);
   }
 
-  render();
+  function updateVisibility() {
+    visible = mode === 'on' || (mode !== 'off' && isDarkMode());
+    html.setAttribute('data-starry', visible ? 'on' : 'off');
+
+    if (toggleButton) {
+      var label = visible ? '隐藏星星' : '显示星星';
+      toggleButton.title = label;
+      toggleButton.setAttribute('aria-label', label);
+      toggleButton.setAttribute('aria-pressed', String(visible));
+    }
+
+    if (visible && animationFrame === null) {
+      render();
+    } else if (!visible && animationFrame !== null) {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+      ctx.clearRect(0, 0, width, height);
+    }
+  }
+
+  function addToggleButton() {
+    var rightside = document.getElementById('rightside-config-show');
+    if (!rightside || document.getElementById('starry-toggle')) return;
+
+    toggleButton = document.createElement('button');
+    toggleButton.id = 'starry-toggle';
+    toggleButton.type = 'button';
+    toggleButton.setAttribute('aria-controls', 'universe');
+    toggleButton.innerHTML = '<i class="fas fa-star" aria-hidden="true"></i>';
+    rightside.insertBefore(toggleButton, rightside.firstChild);
+    toggleButton.addEventListener('click', function() {
+      mode = visible ? 'off' : 'on';
+      try {
+        localStorage.setItem(storageKey, mode);
+      } catch (error) {
+        // 存储失败不影响按钮功能。
+      }
+      updateVisibility();
+    });
+    updateVisibility();
+  }
+
+  new MutationObserver(updateVisibility).observe(html, {
+    attributes: true,
+    attributeFilter: ['data-theme', 'data-darkreader-scheme']
+  });
+  systemDarkMode.addEventListener('change', updateVisibility);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addToggleButton, { once: true });
+  } else {
+    addToggleButton();
+  }
+  updateVisibility();
 })();
