@@ -1071,7 +1071,7 @@ inject:
   bottom:
     - <div class="animated-bg"></div>
     - <canvas id="universe"></canvas>
-    - <script src="/js/starry.js?v=20261008"></script>
+    - <script src="/js/starry.js?v=20261008-2"></script>
     - |
       <style>
         .card-author-button-group {

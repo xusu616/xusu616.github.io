@@ -201,7 +201,7 @@
   }
 
   function addToggleButton() {
-    var rightside = document.getElementById('rightside-config-show');
+    var rightside = document.getElementById('rightside-config-hide');
     if (!rightside || document.getElementById('starry-toggle')) return;
 
     toggleButton = document.createElement('button');
