@@ -20,6 +20,8 @@
   const states = new WeakMap();
   const history = new Map();
   const historyRequests = new Map();
+  // Hold atlas requests independently of panels so a view change cannot cancel them.
+  const artworkRequests = new Map();
   const desktop = window.matchMedia('(min-width: 901px)');
   let preferredPosition = readStorage('pixel-garden-position') === 'main' ? 'main' : 'sidebar';
   let config, data, loading, currentDay, activeWidget;
@@ -81,22 +83,64 @@
       `<div class="pg-month-weekdays" aria-hidden="true">${core.WEEKDAYS.map(day => `<span>${day}</span>`).join('')}</div><div class="pg-month-map">${core.renderMonth(period, config.spriteSheets && config.spriteSheets[period.season], { plantScale: placement === 'sidebar' ? SIDEBAR_MONTHLY_PLANT_SCALE : 1, decorationSprites: config.decorationSprites })}<div class="pg-month-grid" role="group" aria-label="${period.start.slice(0, 7)} Daily contributions">${period.cells.map(day => day ? dayButton(day, true, cupDates && cupDates.has(day.date)) : '<span aria-hidden="true"></span>').join('')}</div></div>`;
     return visual;
   }
-  // Empty shells preserve scroll geometry; only intersecting panels get artwork.
+  function preloadArtwork(url) {
+    if (!url) return Promise.resolve();
+    if (artworkRequests.has(url)) return artworkRequests.get(url).promise;
+    const image = new Image();
+    let attempts = 0;
+    const promise = new Promise((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => {
+        if (++attempts < 3) setTimeout(() => { image.src = url; }, attempts * 500);
+        else {
+          artworkRequests.delete(url);
+          reject(new Error('Garden artwork unavailable'));
+        }
+      };
+    });
+    artworkRequests.set(url, { image, promise });
+    image.src = url;
+    // A failed atlas must not prevent the calendar and controls from working.
+    promise.catch(() => {});
+    return promise;
+  }
+  function prepareArtwork(panel, period, mode) {
+    const sheets = mode === 'week' ? config.weeklySpriteSheets : config.spriteSheets;
+    preloadArtwork(sheets && sheets[period.season] && sheets[period.season].url);
+    panel.querySelectorAll('image').forEach(image => {
+      const url = image.getAttribute('href');
+      preloadArtwork(url);
+      let retries = 0;
+      image.addEventListener('error', () => {
+        if (++retries > 2) return;
+        preloadArtwork(url).then(() => {
+          if (!image.isConnected) return;
+          image.removeAttribute('href');
+          image.setAttribute('href', url);
+        }).catch(() => {});
+      });
+    });
+  }
+  // Prepare the current panel and its neighbors immediately, even off screen.
+  // Keep visited panels until timeline recycling; visibility only pauses motion.
   function syncPanels(widget) {
     const state = states.get(widget);
     const viewport = widget.querySelector('.pg-viewport');
     const width = viewport.getBoundingClientRect().width;
     const active = state.inView && !document.hidden && width > 0;
     widget.dataset.paused = String(!active);
+    if (!width) return;
+    const current = Math.round(viewport.scrollLeft / width);
     viewport.querySelectorAll('.pg-panel').forEach((panel, index) => {
       const visible = active && index * width < viewport.scrollLeft + width - .5 && (index + 1) * width > viewport.scrollLeft + .5;
       panel.dataset.visible = String(visible);
       panel.inert = !visible;
-      if (visible && !panel.hasChildNodes()) {
+      if (Math.abs(index - current) <= 1 && !panel.hasChildNodes()) {
         const period = model(state, Number(panel.dataset.offset));
         panel.dataset.season = period.season;
         panel.innerHTML = panelHtml(period, state.mode, widget.dataset.placement);
-      } else if (!visible && panel.hasChildNodes()) panel.replaceChildren();
+        prepareArtwork(panel, period, state.mode);
+      }
     });
   }
   function makeShells(widget, reuse) {

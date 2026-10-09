@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Branch or commit to build (default gh-pages)'
+        description: 'Branch or commit to build (default main)'
         required: false
-        default: 'gh-pages'
+        default: 'main'
 
 jobs:
   build:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Test
+        run: node --test tests/*.test.cjs
 
       - name: Build
         run: npm run build
