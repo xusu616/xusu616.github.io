@@ -25,7 +25,7 @@ html[data-darkreader-scheme="dark"] #universe {
   }
 }
 
-/* 手动开关优先于主题、系统和 Dark Reader 的暗色模式。 */
+/* 夜间模式下允许手动开关。 */
 html[data-starry="on"] #universe {
   opacity: 1;
 }
@@ -33,6 +33,17 @@ html[data-starry="on"] #universe {
 html[data-starry="off"] #universe {
   opacity: 0;
   visibility: hidden;
+}
+
+/* 白天模式优先于系统深色、插件和保存的星星开关。 */
+html[data-theme="light"] #universe {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+#rightside #starry-toggle[hidden],
+html[data-theme="light"] #rightside #starry-toggle {
+  display: none !important;
 }
 
 #rightside #starry-toggle[aria-pressed="true"] {
@@ -87,6 +98,8 @@ html[data-darkreader-scheme="dark"] .animated-bg {
     radial-gradient(600px 300px at 80% 30%, rgba(14,165,233,.12), transparent 60%),
     radial-gradient(700px 400px at 50% 80%, rgba(99,102,241,.14), transparent 60%);
 }
+
+html[data-theme="light"] .animated-bg { opacity: 0; }
 
 @keyframes floatBg {
   0% { transform: translate3d(0,0,0) scale(1); }

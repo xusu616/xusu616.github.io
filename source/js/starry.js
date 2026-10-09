@@ -16,7 +16,7 @@
   var animationFrame = null;
   var toggleButton;
 
-  // 未手动选择时跟随暗色模式；手动选择优先于所有暗色模式来源。
+  // 保存的开关只影响夜间模式；白天模式始终关闭星星。
   try {
     var savedMode = localStorage.getItem(storageKey);
     if (savedMode === 'on' || savedMode === 'off') mode = savedMode;
@@ -153,8 +153,10 @@
 
   // 检测暗色模式：主题按钮 / 系统暗色 / Dark Reader 插件
   function isDarkMode() {
-    // Butterfly 主题按钮
-    if (html.getAttribute('data-theme') === 'dark') return true;
+    // 博客明确选择的主题优先于系统和插件。
+    var theme = html.getAttribute('data-theme');
+    if (theme === 'light') return false;
+    if (theme === 'dark') return true;
     // 系统暗色模式
     if (systemDarkMode.matches) return true;
     // Dark Reader: 仅夜间模式 (scheme=dark)，排除日间模式 (scheme=dimmed)
@@ -181,10 +183,12 @@
   }
 
   function updateVisibility() {
-    visible = mode === 'on' || (mode !== 'off' && isDarkMode());
+    var dark = isDarkMode();
+    visible = dark && mode !== 'off';
     html.setAttribute('data-starry', visible ? 'on' : 'off');
 
     if (toggleButton) {
+      toggleButton.hidden = !dark;
       var label = visible ? '隐藏星星' : '显示星星';
       toggleButton.title = label;
       toggleButton.setAttribute('aria-label', label);
