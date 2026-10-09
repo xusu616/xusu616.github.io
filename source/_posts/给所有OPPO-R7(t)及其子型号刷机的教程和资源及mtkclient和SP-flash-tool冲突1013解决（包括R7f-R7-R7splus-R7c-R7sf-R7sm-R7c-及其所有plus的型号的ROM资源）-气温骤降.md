@@ -3,7 +3,7 @@ title: 给所有OPPO R7(t)及其子型号刷机的教程和资源及mtkclient和
 tags:
   - 刷机
 categories:
-  - Android架构和安全
+  - Android
   - 刷机
 date: 2026-02-04 03:24:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19573235
