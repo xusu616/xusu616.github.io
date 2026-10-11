@@ -6,7 +6,6 @@ date: 2026-01-15 15:53:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19489540
 categories:
     - C
-    - 底层编程
 ---
 
 0. start函数的内联汇编和底层操作 看到了这个视频，用及其底层的办法重写了sleep，我觉得这种靠近底层的C语言十分有意思，花了时间来学了一下这个东西 点击查看视频，不能内嵌我就没辙了,不过手机UI适合点这个 <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=115687276152800&bvid=BV1gu2DBGEpT&cid=34606156579&p=1" scrolling="no" border="0" frameborder="no" framespacing="0"...

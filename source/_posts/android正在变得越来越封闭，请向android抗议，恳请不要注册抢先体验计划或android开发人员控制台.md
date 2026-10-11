@@ -5,7 +5,6 @@ tags:
   - Android
 categories:
   - Android
-  - Android生态
 excerpt: Android如果不开放了，那我们就没有使用Android的必要
 ---
 

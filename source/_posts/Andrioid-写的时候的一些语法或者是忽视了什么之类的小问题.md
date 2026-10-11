@@ -6,7 +6,7 @@ tags:
   - Kotlin
 categories:
   - Android
-  - Kotlin
+  - 应用开发
 excerpt: 随便记一点东西在这里, 两个问题，没考虑preview，隐式少传了参数
 ---
 

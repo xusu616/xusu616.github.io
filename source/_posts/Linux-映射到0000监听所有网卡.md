@@ -6,7 +6,7 @@ tags:
   - WSL
 categories:
   - Linux
-  - WSL
+  - 工具与配置
 excerpt: 把只监听 127.0.0.1 的服务改成 0.0.0.0，让局域网其他设备也能访问；记录 dsh 的安全限制、WSL2 端口转发和 SSH 隧道
 ---
 

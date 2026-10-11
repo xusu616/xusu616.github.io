@@ -6,7 +6,6 @@ tags:
   - 嵌入式
 categories:
   - 嵌入式
-  - FPGA
 excerpt: 依旧😡😡😡😡这垃圾二手板子给我整没辙了
 ---
 

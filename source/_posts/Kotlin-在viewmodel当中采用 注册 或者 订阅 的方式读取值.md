@@ -6,7 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
-  - Android架构
+  - Android开发
 excerpt: 快照读一次，订阅持续监听，跨页面同步 使用 同一个 ViewModel 实例
 ---
 
