@@ -5,7 +5,7 @@ tags:
   - Git
 categories:
   - Linux
-  - Git
+  - 工具与配置
 excerpt: git fsck 报 broken link 和 missing commit，排查半天才发现是本地浅层 clone 留下的断链，fork 在 GitHub 上一直好好的，最后把缺失对象重新拉回来就修好了
 ---
 

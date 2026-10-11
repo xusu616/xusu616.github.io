@@ -6,7 +6,7 @@ tags:
   - Android
 categories:
   - Kotlin
-  - Android UI
+  - Android开发
 excerpt: 在修饰出错时看源码快速判断compose种类然后正确使用 以及 类委托的使用（类委托和属性委托共用一个关键词by）
 ---
 

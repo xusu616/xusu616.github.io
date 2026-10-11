@@ -6,7 +6,7 @@ tags:
   - Kotlin
 categories:
   - Kotlin
-  - Android架构
+  - Android开发
 excerpt: 传递的形参不应该强行修改之后再传回去，没必要使用可变对象之类的东西 ~~可是我不熟悉回调到处传的模式~~
 ---
 

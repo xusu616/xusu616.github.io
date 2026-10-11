@@ -8,7 +8,7 @@ date: 2026-03-19 15:47:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19741168
 categories:
     - Android
-    - Kotlin
+    - 应用开发
 ---
 
 区别 区别就是m3比m2好看（不是 官网扒出来的对迁移有阻碍的API 缺少的 API： M2 M3 androidx.compose.material.swipeable 目前无法添加文件 已替换的 API： M2 M3 androidx.compose.material.BackdropScaffold 无 M3 等效项，请改用 Scaffold 或 BottomSheetScaffold androidx.compose.material.BottomDrawer 无 M3 等效项，请改用 ModalBottomSheet 重命名的 API： M2 M3...

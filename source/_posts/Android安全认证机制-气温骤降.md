@@ -6,7 +6,6 @@ date: 2025-12-16 01:07:00
 cnblogs_url: https://i.cnblogs.com/posts/edit;postId=19355259
 categories:
     - Android
-    - 架构与安全
 ---
 
 信任根 一切安全都始于硬件。 Android 的信任链始于设备中不可更改的，受保护的硬件区域（即使解锁bootloader刷机也不会被破坏 硬件信任根仍然会验证 Bootloader 的第一阶段代码。然而，一旦 Bootloader 被解锁，它在执行时会有条件地跳过或忽略对后续分区的验证） 即硬件信任根（Hardware Root of Trust） 工作方式： 在设备启动的最初阶段，芯片上的固件会验证下一阶段引导加载程序（Bootloader）的数字签名。如果签名不匹配或被篡改，启动过程将立即停止。 dm-verity Android早期 (Android 4.4 - Android...
