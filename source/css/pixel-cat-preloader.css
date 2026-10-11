@@ -81,6 +81,7 @@ html[data-theme="dark"] .pc-preloader {
 }
 
 .pc-loader-svg .pixel-cat-state { display: inline; }
+.pc-loader-svg .px-eyes-open { animation: px-eyes-open 2.4s steps(1) -1.9s infinite; }
 .pc-loader-svg .px-blink { animation: px-blink 2.4s steps(1) -1.9s infinite; }
 .pc-loader-svg .px-ear-rest { animation: px-ear-rest 2.7s steps(1) -2.3s infinite; }
 .pc-loader-svg .px-ear-twitch { animation: px-ear-twitch 2.7s steps(1) -2.3s infinite; }
@@ -97,6 +98,7 @@ html[data-theme="dark"] .pc-preloader {
   .pc-loader-spinner,
   .pc-loader-spinner .dot1,
   .pc-loader-spinner .dot2,
+  .pc-loader-svg .px-eyes-open,
   .pc-loader-svg .px-blink,
   .pc-loader-svg .px-ear-rest,
   .pc-loader-svg .px-ear-twitch,
@@ -104,5 +106,5 @@ html[data-theme="dark"] .pc-preloader {
   .pc-loader-svg .px-tail-flick { animation: none; }
   .pc-loader-svg .px-blink,
   .pc-loader-svg .px-ear-twitch,
-  .pc-loader-svg .px-tail-flick { opacity: 0; }
+  .pc-loader-svg .px-tail-flick { visibility: hidden; }
 }

@@ -40,6 +40,6 @@ const initialize = fs.readFileSync(path.join(hexo.source_dir, 'js', 'pixel-cat-p
 hexo.extend.filter.register('after_render:html', html => {
   if (!/<body\b/i.test(html)) return html;
   return html
-    .replace('</head>', '<link rel="stylesheet" href="/css/pixel-cat-preloader.css?v=3"></head>')
+    .replace('</head>', '<link rel="stylesheet" href="/css/pixel-cat-preloader.css?v=4"></head>')
     .replace(/<body\b[^>]*>/i, match => `${match}${loader}<script>${initialize}</script>`);
 });

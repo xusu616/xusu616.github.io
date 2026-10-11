@@ -147,75 +147,115 @@ html[data-theme="dark"] { color-scheme: dark; }
   --pixel-zzz: #6E656A;
 }
 
+/* Swap pixel frames without opacity layers: compositing overlapping SVG
+ * pixels at fractional scales can leave seams around the eyes and nose. */
+@keyframes px-eyes-open {
+  0% { visibility: visible; }
+  92% { visibility: hidden; }
+  96% { visibility: visible; }
+  100% { visibility: visible; }
+}
+
 @keyframes px-blink {
-  0%, 92%      { opacity: 0; }
-  92.01%, 96%  { opacity: 1; }
-  96.01%, 100% { opacity: 0; }
+  0% { visibility: hidden; }
+  92% { visibility: visible; }
+  96% { visibility: hidden; }
+  100% { visibility: hidden; }
 }
 
 @keyframes px-tail-rest {
-  0%, 68%      { opacity: 1; }
-  68.01%, 74%  { opacity: 0; }
-  74.01%, 80%  { opacity: 1; }
-  80.01%, 86%  { opacity: 0; }
-  86.01%, 100% { opacity: 1; }
+  0% { visibility: visible; }
+  68% { visibility: hidden; }
+  74% { visibility: visible; }
+  80% { visibility: hidden; }
+  86% { visibility: visible; }
+  100% { visibility: visible; }
 }
+
 @keyframes px-tail-flick {
-  0%, 68%      { opacity: 0; }
-  68.01%, 74%  { opacity: 1; }
-  74.01%, 80%  { opacity: 0; }
-  80.01%, 86%  { opacity: 1; }
-  86.01%, 100% { opacity: 0; }
+  0% { visibility: hidden; }
+  68% { visibility: visible; }
+  74% { visibility: hidden; }
+  80% { visibility: visible; }
+  86% { visibility: hidden; }
+  100% { visibility: hidden; }
 }
 
 @keyframes px-paw-rest {
-  0%, 58%      { opacity: 1; }
-  58.01%, 90%  { opacity: 0; }
-  90.01%, 100% { opacity: 1; }
+  0% { visibility: visible; }
+  58% { visibility: hidden; }
+  90% { visibility: visible; }
+  100% { visibility: visible; }
 }
+
 @keyframes px-paw-left {
-  0%, 58%      { opacity: 0; }
-  58.01%, 66%  { opacity: 1; }
-  66.01%, 74%  { opacity: 0; }
-  74.01%, 82%  { opacity: 1; }
-  82.01%, 100% { opacity: 0; }
+  0% { visibility: hidden; }
+  58% { visibility: visible; }
+  66% { visibility: hidden; }
+  74% { visibility: visible; }
+  82% { visibility: hidden; }
+  100% { visibility: hidden; }
 }
+
 @keyframes px-paw-right {
-  0%, 66%      { opacity: 0; }
-  66.01%, 74%  { opacity: 1; }
-  74.01%, 82%  { opacity: 0; }
-  82.01%, 90%  { opacity: 1; }
-  90.01%, 100% { opacity: 0; }
+  0% { visibility: hidden; }
+  66% { visibility: visible; }
+  74% { visibility: hidden; }
+  82% { visibility: visible; }
+  90% { visibility: hidden; }
+  100% { visibility: hidden; }
 }
 
 @keyframes px-paw-still {
-  0%, 62%      { opacity: 1; }
-  62.01%, 78%  { opacity: 0; }
-  78.01%, 100% { opacity: 1; }
+  0% { visibility: visible; }
+  62% { visibility: hidden; }
+  78% { visibility: visible; }
+  100% { visibility: visible; }
 }
+
 @keyframes px-paw-stretch {
-  0%, 62%      { opacity: 0; }
-  62.01%, 78%  { opacity: 1; }
-  78.01%, 100% { opacity: 0; }
+  0% { visibility: hidden; }
+  62% { visibility: visible; }
+  78% { visibility: hidden; }
+  100% { visibility: hidden; }
 }
 
 @keyframes px-ear-rest {
-  0%, 88%      { opacity: 1; }
-  88.01%, 94%  { opacity: 0; }
-  94.01%, 100% { opacity: 1; }
-}
-@keyframes px-ear-twitch {
-  0%, 88%      { opacity: 0; }
-  88.01%, 94%  { opacity: 1; }
-  94.01%, 100% { opacity: 0; }
+  0% { visibility: visible; }
+  88% { visibility: hidden; }
+  94% { visibility: visible; }
+  100% { visibility: visible; }
 }
 
-@keyframes px-lick-a { 0%, 49.99% { opacity: 1; } 50%, 100% { opacity: 0; } }
-@keyframes px-lick-b { 0%, 49.99% { opacity: 0; } 50%, 100% { opacity: 1; } }
+@keyframes px-ear-twitch {
+  0% { visibility: hidden; }
+  88% { visibility: visible; }
+  94% { visibility: hidden; }
+  100% { visibility: hidden; }
+}
+
+@keyframes px-lick-a {
+  0% { visibility: visible; }
+  50% { visibility: hidden; }
+  100% { visibility: hidden; }
+}
+
+@keyframes px-lick-b {
+  0% { visibility: hidden; }
+  50% { visibility: visible; }
+  100% { visibility: visible; }
+}
+
+@keyframes px-chew-rest {
+  0% { visibility: visible; }
+  44% { visibility: hidden; }
+  100% { visibility: hidden; }
+}
 
 @keyframes px-chew {
-  0%, 44%      { opacity: 0; }
-  44.01%, 100% { opacity: 1; }
+  0% { visibility: hidden; }
+  44% { visibility: visible; }
+  100% { visibility: visible; }
 }
 
 @keyframes px-zzz {
@@ -226,6 +266,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 
 .px-ear-rest    { animation: px-ear-rest 3.4s steps(1) infinite; }
 .px-ear-twitch  { animation: px-ear-twitch 3.4s steps(1) infinite; }
+.px-eyes-open   { animation: px-eyes-open 4.8s steps(1) infinite; }
 .px-blink       { animation: px-blink 4.8s steps(1) infinite; }
 .px-tail-rest   { animation: px-tail-rest 5.6s steps(1) infinite; }
 .px-tail-flick  { animation: px-tail-flick 5.6s steps(1) infinite; }
@@ -236,6 +277,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 .px-paw-stretch { animation: px-paw-stretch 7.1s steps(1) infinite; }
 .px-lick-a      { animation: px-lick-a .5s steps(1) infinite; }
 .px-lick-b      { animation: px-lick-b .5s steps(1) infinite; }
+.px-chew-rest   { animation: px-chew-rest .62s steps(1) infinite; }
 .px-chew        { animation: px-chew .62s steps(1) infinite; }
 .px-zzz         { animation: px-zzz 4.6s ease-in-out infinite; }
 
@@ -265,6 +307,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 @media (prefers-reduced-motion: reduce) {
   .px-ear-rest,
   .px-ear-twitch,
+  .px-eyes-open,
   .px-blink,
   .px-tail-rest,
   .px-tail-flick,
@@ -275,6 +318,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   .px-paw-stretch,
   .px-lick-a,
   .px-lick-b,
+  .px-chew-rest,
   .px-chew,
   .px-zzz {
     animation: none;
@@ -287,7 +331,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   .px-paw-stretch,
   .px-lick-b,
   .px-chew {
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
