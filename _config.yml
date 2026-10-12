@@ -13,7 +13,7 @@ timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://rD227.github.io
+url: https://rD227.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -93,6 +93,7 @@ pagination_dir: page
 ## include:/exclude: options only apply to the 'source/' folder
 include:
   - ".well-known/**"
+  - ".nojekyll"
 exclude:
 ignore:
 
