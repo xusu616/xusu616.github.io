@@ -17,12 +17,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
           ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
@@ -33,10 +41,22 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify build artifacts
+        run: |
+          echo "Checking for zero-byte HTML files..."
+          ZERO_FILES=$(find public -type f -name "*.html" -size 0)
+          if [ -n "$ZERO_FILES" ]; then
+            echo "Error: Found zero-byte HTML files in public/:"
+            echo "$ZERO_FILES"
+            exit 1
+          fi
+          echo "Check passed: all HTML files have content."
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
+          include-hidden-files: true
 
   deploy:
     needs: build
