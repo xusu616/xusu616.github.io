@@ -56,7 +56,7 @@ social:
 favicon: https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640
 
 avatar:
-  img: https://q1.qlogo.cn/g?b=qq&nk=2329976818&s=640
+  img: /img/avatar.png
   effect: false
 
 # Disable all banner images
