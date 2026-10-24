@@ -164,7 +164,7 @@ subtitle:
   source: false
   # If you close the typewriter effect, the subtitle will only show the first line of sub
   sub:
-   - "Hello, World!()"
+   - "Wait... we already went through this, didn't we? You got more than one shot!"
 
 # Article layout on the homepage
 # 1: Cover on the left, info on the right
@@ -292,7 +292,7 @@ aside:
       link: https://github.com/xxxxxx
   card_announcement:
     enable: true
-    content: emmm博客园也可以美化（）等等吧，现在也不会（）
+    content: emmm博客园就算了吧
   card_recent_post:
     enable: true
     # If set 0 will show all
