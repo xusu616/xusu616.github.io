@@ -5,7 +5,7 @@ tags:
   - rust
 categories:
   - Rust
-excerpt: emmm，无所谓了就学学也行（静态库.a莫名其妙遇到了（（（
+excerpt: emmm尴尬
 ---
 
 # Rust 的借用类型 &CStr 和 unsafe
@@ -30,9 +30,9 @@ let name: String = String::from("Hello");
 let borrowed: &String = &name;
 ```
 
-~~但是这里的 `&` 和 Kotlin 的 `?` 不是同一种东西~~      ~ai又写废话~
+~~但是这里的 `&` 和 Kotlin 的 `?` 不是同一种东西~~      \~ai又写废话\~
 
-*我在和ai对话的时候也没说错/说这个，不知道写上去干嘛，argon说是能说人话，但是怎么能这么蠢*
+_我在和ai对话的时候也没说错/说这个，不知道写上去干嘛，argon说是能说人话，但是怎么能这么蠢_
 
 Kotlin 的 `Int?` 对应的其实更加接近 Rust 的 `Option<i32>`
 
@@ -75,11 +75,11 @@ let borrowed: &CStr = owned.as_c_str();
 
 大概就类似于 `String` 和 `&str` 的区别
 
-## `unsafe` 也是一种类型吗？
+## `unsafe` 不是类型
 
 其实不是
 
-一开始我还以为 `unsafe {}` 也是一种类似 `Some()` 的模具，需要匹配才能使用
+~~一开始我还以为 `unsafe {}` 也是一种类似 `Some()` 的模具，需要匹配才能使用~~
 
 但是它实际上是 Rust 的一个语法块
 
@@ -108,7 +108,7 @@ let name = unsafe {
 
 # 关于生命周期
 
-我之前认为就是就比如一个加a和b的函数，加了‘    就能保证生命周期覆盖a和b？
+~~我之前认为就是就比如一个加a和b的函数，加了‘    就能保证生命周期覆盖a和b？~~
 
 但是实际上
 
