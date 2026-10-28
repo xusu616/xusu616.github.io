@@ -1144,6 +1144,32 @@ inject:
         #rightside-config-hide #darkcode {
           display: block;
         }
+
+        /* 归档卡片底部右侧 Archived 按钮样式 */
+        .card-archive-footer {
+          display: flex;
+          justify-content: flex-end;
+          margin-top: 8px;
+          padding-top: 6px;
+          border-top: 1px dashed rgba(153, 169, 191, 0.25);
+        }
+        .card-archive-archived-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 3px 10px;
+          border-radius: 6px;
+          font-size: 0.85em;
+          color: var(--font-color);
+          background: rgba(153, 169, 191, 0.12);
+          text-decoration: none;
+          transition: all 0.25s ease;
+        }
+        .card-archive-archived-btn:hover {
+          background: var(--btn-bg, #49b1f5);
+          color: var(--btn-color, #fff);
+          transform: translateY(-1px);
+        }
       </style>
     - |
       <script>
