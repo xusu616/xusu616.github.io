@@ -2,7 +2,7 @@
 title: Rust-借用泛型枚举，和长得类似的安全操作
 date: 2026-10-26 08:10:00
 tags:
-  - rust
+  - Rust
 categories:
   - Rust
 excerpt: emmm尴尬
