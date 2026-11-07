@@ -35,6 +35,30 @@ function validSnapshot(data, username) {
     data.contributions.every(item => /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isSafeInteger(item.count) && item.count >= 0);
 }
 
+// Merge two contribution lists by taking Math.max per date (never summing counts)
+// so local .git commits and GitHub contributions never double-count after unban.
+function mergeContributions(listA, listB, today) {
+  const map = new Map();
+  for (const list of [listA, listB]) {
+    if (!Array.isArray(list)) continue;
+    for (const item of list) {
+      if (item && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isSafeInteger(item.count) && item.count >= 0) {
+        const prev = map.get(item.date);
+        map.set(item.date, prev === undefined ? item.count : Math.max(prev, item.count));
+      }
+    }
+  }
+  if (today && /^\d{4}-\d{2}-\d{2}$/.test(today)) {
+    for (let offset = -370; offset <= 0; offset++) {
+      const date = garden.shiftDate(today, offset);
+      if (!map.has(date)) map.set(date, 0);
+    }
+  }
+  return Array.from(map.entries())
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
 async function generate(hexo, options = {}) {
   const settings = hexo.config.pixel_garden;
   if (!settings || settings.enable === false) return [];
@@ -43,7 +67,9 @@ async function generate(hexo, options = {}) {
   const timezone = settings.timezone || hexo.config.timezone || 'Asia/Shanghai';
   const hemisphere = settings.hemisphere === 'south' ? 'south' : 'north';
   const today = garden.dateKey(new Date(), timezone);
+  const sourceDir = hexo.source_dir || path.join(hexo.base_dir, 'source');
   const cachePath = path.join(hexo.base_dir, '.cache', 'pixel-garden', `${username}.json`);
+  const localSnapshotPath = path.join(sourceDir, 'garden', 'local-snapshot.json');
   let snapshot = { username, updatedAt: null, source: 'github', contributions: [], unavailable: true };
   // Standalone builds can supply an offline snapshot without requesting GitHub.
   if (options.snapshot !== undefined) {
@@ -58,12 +84,25 @@ async function generate(hexo, options = {}) {
       if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
       snapshot = { username, updatedAt: new Date().toISOString(), source: 'github', contributions: parseCalendar(await response.text()) };
     } catch (error) {
-      hexo.log.warn(`[pixel-garden] ${error.message}; using cache if available`);
+      hexo.log.warn(`[pixel-garden] ${error.message}; using local/cache fallback if available`);
       try {
         const cached = JSON.parse(await fs.readFile(cachePath, 'utf8'));
         if (validSnapshot(cached, username)) snapshot = { ...cached, stale: true };
       } catch (_) { /* The widget explicitly labels unavailable data. */ }
     }
+    try {
+      const localSnap = JSON.parse(await fs.readFile(localSnapshotPath, 'utf8'));
+      if (validSnapshot(localSnap, username)) {
+        const merged = mergeContributions(snapshot.contributions, localSnap.contributions, today);
+        snapshot = {
+          username,
+          updatedAt: snapshot.updatedAt || new Date().toISOString(),
+          source: snapshot.unavailable ? 'local-git' : 'merged',
+          contributions: merged,
+          unavailable: false
+        };
+      }
+    } catch (_) { /* Optional local git snapshot not present or invalid. */ }
   }
   if (options.snapshot === undefined && !snapshot.unavailable && !snapshot.stale) {
     try {

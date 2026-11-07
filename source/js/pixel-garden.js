@@ -46,16 +46,35 @@
   function writeStorage(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* Storage may be disabled. */ }
   }
-  function cacheKey() { return `pixel-garden-v1:${config.username}`; }
+  function cacheKey() { return `pixel-garden-v2:${config.username}`; }
   function cachedData() {
     const cached = readStorage(cacheKey());
     return valid(cached) ? cached : null;
   }
+  function mergeContributionLists(listA, listB) {
+    const map = new Map();
+    for (const list of [listA, listB]) {
+      if (!Array.isArray(list)) continue;
+      for (const day of list) {
+        if (day && /^\d{4}-\d{2}-\d{2}$/.test(day.date) && Number.isSafeInteger(day.count) && day.count >= 0) {
+          const prev = map.get(day.date);
+          map.set(day.date, prev === undefined ? day.count : Math.max(prev, day.count));
+        }
+      }
+    }
+    return Array.from(map.entries()).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
+  }
   function allContributions() {
     const counts = new Map();
-    history.forEach(value => value.contributions.forEach(day => counts.set(day.date, day)));
-    // The latest rolling snapshot takes precedence over archived years.
-    (data && data.contributions || []).forEach(day => counts.set(day.date, day));
+    history.forEach(value => value.contributions.forEach(day => {
+      const prev = counts.get(day.date);
+      counts.set(day.date, prev ? { date: day.date, count: Math.max(prev.count, day.count) } : day);
+    }));
+    // Merge rolling/local snapshot with archived years using Math.max to prevent double-counting.
+    (data && data.contributions || []).forEach(day => {
+      const prev = counts.get(day.date);
+      counts.set(day.date, prev ? { date: day.date, count: Math.max(prev.count, day.count) } : day);
+    });
     return Array.from(counts.values());
   }
   function model(state, offset) {
@@ -391,15 +410,26 @@
     if (cached) update(cached);
     try {
       const snapshot = (await readJson(config.snapshotUrl)).value;
-      if (valid(snapshot) && (!data || !valid(data) || Date.parse(snapshot.updatedAt) > Date.parse(data.updatedAt))) update(snapshot);
+      if (valid(snapshot)) {
+        const merged = data && valid(data)
+          ? { ...snapshot, updatedAt: Date.parse(snapshot.updatedAt) >= Date.parse(data.updatedAt) ? snapshot.updatedAt : data.updatedAt, contributions: mergeContributionLists(data.contributions, snapshot.contributions) }
+          : snapshot;
+        update(merged);
+      }
     } catch (_) { /* A local or live copy may still be usable. */ }
     const freshCache = cached && Date.now() - Date.parse(cached.updatedAt) < CACHE_TTL && core.makeWeek(cached.contributions, currentDay, config.hemisphere).complete;
     if (config.liveRefresh && !freshCache) {
       try {
         const response = await readJson(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(config.username)}?y=last`);
         const live = { username: config.username, source: 'contributions-api', updatedAt: new Date(Date.now() - Math.max(0, response.age) * 1000).toISOString(), contributions: response.value.contributions };
-        if (valid(live) && (!data || !valid(data) || Date.parse(live.updatedAt) >= Date.parse(data.updatedAt)) &&
-          (!data || !core.makeWeek(data.contributions, currentDay, config.hemisphere).complete || core.makeWeek(live.contributions, currentDay, config.hemisphere).complete)) update(live);
+        if (valid(live)) {
+          const mergedLive = data && valid(data)
+            ? { ...live, updatedAt: Date.parse(live.updatedAt) >= Date.parse(data.updatedAt) ? live.updatedAt : data.updatedAt, contributions: mergeContributionLists(data.contributions, live.contributions) }
+            : live;
+          if (!data || !valid(data) || !core.makeWeek(data.contributions, currentDay, config.hemisphere).complete || core.makeWeek(mergedLive.contributions, currentDay, config.hemisphere).complete) {
+            update(mergedLive);
+          }
+        }
       } catch (_) { /* Keep the GitHub snapshot or cached calendar. */ }
     }
     if (!data) update({ username: config.username, contributions: [], unavailable: true });
