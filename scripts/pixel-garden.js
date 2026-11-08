@@ -59,11 +59,29 @@ function mergeContributions(listA, listB, today) {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// Parse GitLab public push events (branch commits only, deduplicated by commit_to SHA)
+function parseGitLabEvents(events, timezone) {
+  if (!Array.isArray(events)) return [];
+  const seenCommits = new Set();
+  const counts = new Map();
+  for (const ev of events) {
+    const pd = ev && ev.push_data;
+    if (!pd || pd.ref_type !== 'branch' || !pd.commit_to || !Number.isSafeInteger(pd.commit_count) || pd.commit_count <= 0) continue;
+    const date = garden.dateKey(new Date(ev.created_at), timezone);
+    if (date <= '2026-11-06') continue; // 2026-11-06 was bulk repo migration; historical commits are in local-snapshot.json
+    if (seenCommits.has(pd.commit_to)) continue;
+    seenCommits.add(pd.commit_to);
+    counts.set(date, (counts.get(date) || 0) + pd.commit_count);
+  }
+  return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
+}
+
 async function generate(hexo, options = {}) {
   const settings = hexo.config.pixel_garden;
   if (!settings || settings.enable === false) return [];
   const username = String(settings.username || '');
   if (!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(username)) throw new Error('pixel_garden.username must be a GitHub username');
+  const gitlabUsername = String(settings.gitlab_username || 'xusu616');
   const timezone = settings.timezone || hexo.config.timezone || 'Asia/Shanghai';
   const hemisphere = settings.hemisphere === 'south' ? 'south' : 'north';
   const today = garden.dateKey(new Date(), timezone);
@@ -96,13 +114,31 @@ async function generate(hexo, options = {}) {
         const merged = mergeContributions(snapshot.contributions, localSnap.contributions, today);
         snapshot = {
           username,
-          updatedAt: snapshot.updatedAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           source: snapshot.unavailable ? 'local-git' : 'merged',
           contributions: merged,
           unavailable: false
         };
       }
     } catch (_) { /* Optional local git snapshot not present or invalid. */ }
+    try {
+      const glRes = await fetch(`https://gitlab.com/api/v4/users/${encodeURIComponent(gitlabUsername)}/events?action=pushed&per_page=100`, {
+        headers: { 'User-Agent': 'Hexo-Pixel-Garden' },
+        signal: AbortSignal.timeout(10000)
+      });
+      if (glRes.ok) {
+        const glContribs = parseGitLabEvents(await glRes.json(), timezone);
+        if (glContribs.length > 0) {
+          snapshot = {
+            username,
+            updatedAt: new Date().toISOString(),
+            source: 'merged',
+            contributions: mergeContributions(snapshot.contributions, glContribs, today),
+            unavailable: false
+          };
+        }
+      }
+    } catch (_) { /* GitLab live events optional fallback. */ }
   }
   if (options.snapshot === undefined && !snapshot.unavailable && !snapshot.stale) {
     try {

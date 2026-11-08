@@ -1223,7 +1223,7 @@ inject:
       </script>
 
     - <script src="/js/pixel-garden-core.js?v=14" defer></script>
-    - <script src="/js/pixel-garden.js?v=16" data-config="/garden/config.json" defer></script>
+    - <script src="/js/pixel-garden.js?v=17" data-config="/garden/config.json" defer></script>
     - <script src="/js/counter-fallback.js?v=1"></script>
 
 # CDN Settings
