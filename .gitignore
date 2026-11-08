@@ -12,3 +12,9 @@ _multiconfig.yml
 2027/
 2028/
 2029/
+scripts/convert_to_pdf.py
+scripts/generate_docx_and_pdf.py
+scripts/generate_figures.py
+scripts/generate_pptx.py
+scripts/inspect_doc.py
+scripts/scan_posts.py
