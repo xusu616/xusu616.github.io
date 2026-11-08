@@ -46,6 +46,7 @@ code_blocks:
 # Formal:
 #   icon: link || the description || color
 social:
+  fab fa-gitlab: https://gitlab.com/xusu616 || GitLab || '#fc6d26'
   fab fa-github: https://github.com/rD227 || Github || '#24292e'
   fas fa-blog: https://www.cnblogs.com/xvsu || 博客园 || '#0066cc'
 
@@ -1077,22 +1078,29 @@ inject:
       <style>
         .card-author-button-group {
           display: flex;
-          gap: 10px;
+          gap: 8px;
           margin-top: 10px;
-          padding: 0 15px;
+          padding: 0 10px;
         }
         .card-author-button-group a {
           flex: 1;
-          padding: 8px 12px;
+          padding: 8px 6px;
           border-radius: 8px;
           text-align: center;
           text-decoration: none;
-          font-size: 14px;
+          font-size: 13px;
           transition: all 0.3s;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: 4px;
+        }
+        .card-author-button-group .gitlab-btn {
+          background: #fc6d26;
+          color: white;
+        }
+        .card-author-button-group .gitlab-btn:hover {
+          background: #e24329;
         }
         .card-author-button-group .github-btn {
           background: #24292e;
@@ -1179,7 +1187,7 @@ inject:
           if (cardInfo) {
             var group = document.createElement('div');
             group.className = 'card-author-button-group';
-            group.innerHTML = '<a href="https://github.com/rD227" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub</a><a href="https://www.cnblogs.com/xvsu" target="_blank" class="blog-btn"><i class="fas fa-blog"></i> 博客园</a>';
+            group.innerHTML = '<a href="https://gitlab.com/xusu616" target="_blank" class="gitlab-btn"><i class="fab fa-gitlab"></i> GitLab</a><a href="https://github.com/rD227" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub</a><a href="https://www.cnblogs.com/xvsu" target="_blank" class="blog-btn"><i class="fas fa-blog"></i> 博客园</a>';
             cardInfo.appendChild(group);
           }
 

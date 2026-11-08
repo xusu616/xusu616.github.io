@@ -1,8 +1,9 @@
 backend:
   name: gitlab
-  repo: xusu616/rd227.github.io
+  repo: xusu616/xusu616.gitlab.io
   branch: main
-  site_domain: rd227.netlify.app
+  # 如果使用 Netlify OAuth 代理才需要 site_domain；若直接在 GitLab Pages 使用 Sveltia CMS，可直接使用 Personal Access Token 或 GitLab OAuth App
+  # site_domain: rd227.netlify.app
 
 media_folder: "source/img"
 public_folder: "/img"
