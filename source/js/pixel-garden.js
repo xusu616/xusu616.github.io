@@ -46,10 +46,24 @@
   function writeStorage(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* Storage may be disabled. */ }
   }
-  function cacheKey() { return `pixel-garden-v2:${config.username}`; }
+  function cacheKey() { return `pixel-garden-v3:${config.username}`; }
   function cachedData() {
     const cached = readStorage(cacheKey());
     return valid(cached) ? cached : null;
+  }
+  function parseGitLabEvents(events) {
+    if (!Array.isArray(events)) return [];
+    const seen = new Set();
+    const counts = new Map();
+    for (const ev of events) {
+      const pd = ev && ev.push_data;
+      if (!pd || pd.ref_type !== 'branch' || !pd.commit_to || !Number.isSafeInteger(pd.commit_count) || pd.commit_count <= 0) continue;
+      const date = core.dateKey(new Date(ev.created_at), config.timezone);
+      if (date <= '2026-11-06' || seen.has(pd.commit_to)) continue;
+      seen.add(pd.commit_to);
+      counts.set(date, (counts.get(date) || 0) + pd.commit_count);
+    }
+    return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
   }
   function mergeContributionLists(listA, listB) {
     const map = new Map();
@@ -419,6 +433,13 @@
     } catch (_) { /* A local or live copy may still be usable. */ }
     const freshCache = cached && Date.now() - Date.parse(cached.updatedAt) < CACHE_TTL && core.makeWeek(cached.contributions, currentDay, config.hemisphere).complete;
     if (config.liveRefresh && !freshCache) {
+      try {
+        const glEvents = (await readJson('https://gitlab.com/api/v4/users/xusu616/events?action=pushed&per_page=100')).value;
+        const glContribs = parseGitLabEvents(glEvents);
+        if (glContribs.length > 0 && data && valid(data)) {
+          update({ ...data, updatedAt: new Date().toISOString(), contributions: mergeContributionLists(data.contributions, glContribs) });
+        }
+      } catch (_) { /* Optional GitLab live events refresh. */ }
       try {
         const response = await readJson(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(config.username)}?y=last`);
         const live = { username: config.username, source: 'contributions-api', updatedAt: new Date(Date.now() - Math.max(0, response.age) * 1000).toISOString(), contributions: response.value.contributions };
