@@ -67,8 +67,10 @@ function parseGitLabEvents(events, timezone) {
   for (const ev of events) {
     const pd = ev && ev.push_data;
     if (!pd || pd.ref_type !== 'branch' || !pd.commit_to || !Number.isSafeInteger(pd.commit_count) || pd.commit_count <= 0) continue;
+    // Skip bulk initial branch imports from 2026-11-06/07 migration (where action_name is 'pushed new' with historical commits)
+    if (ev.created_at < '2026-11-07T01:40:00Z') continue;
+    if (ev.action_name === 'pushed new' && pd.commit_count > 1) continue;
     const date = garden.dateKey(new Date(ev.created_at), timezone);
-    if (date <= '2026-11-06') continue; // 2026-11-06 was bulk repo migration; historical commits are in local-snapshot.json
     if (seenCommits.has(pd.commit_to)) continue;
     seenCommits.add(pd.commit_to);
     counts.set(date, (counts.get(date) || 0) + pd.commit_count);
