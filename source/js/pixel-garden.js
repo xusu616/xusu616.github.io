@@ -46,7 +46,7 @@
   function writeStorage(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* Storage may be disabled. */ }
   }
-  function cacheKey() { return `pixel-garden-v3:${config.username}`; }
+  function cacheKey() { return `pixel-garden-v4:${config.username}`; }
   function cachedData() {
     const cached = readStorage(cacheKey());
     return valid(cached) ? cached : null;
@@ -58,8 +58,10 @@
     for (const ev of events) {
       const pd = ev && ev.push_data;
       if (!pd || pd.ref_type !== 'branch' || !pd.commit_to || !Number.isSafeInteger(pd.commit_count) || pd.commit_count <= 0) continue;
+      if (ev.created_at < '2026-11-07T01:40:00Z') continue;
+      if (ev.action_name === 'pushed new' && pd.commit_count > 1) continue;
       const date = core.dateKey(new Date(ev.created_at), config.timezone);
-      if (date <= '2026-11-06' || seen.has(pd.commit_to)) continue;
+      if (seen.has(pd.commit_to)) continue;
       seen.add(pd.commit_to);
       counts.set(date, (counts.get(date) || 0) + pd.commit_count);
     }
