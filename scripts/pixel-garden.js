@@ -48,6 +48,8 @@ function mergeContributions(listA, listB, today) {
       }
     }
   }
+  // If today is provided, ensure the rolling 370-day window has no gaps (0 default),
+  // while preserving all older dates present in listA or listB (e.g. 2024-2025).
   if (today && /^\d{4}-\d{2}-\d{2}$/.test(today)) {
     for (let offset = -370; offset <= 0; offset++) {
       const date = garden.shiftDate(today, offset);
@@ -111,6 +113,26 @@ async function generate(hexo, options = {}) {
       } catch (_) { /* The widget explicitly labels unavailable data. */ }
     }
     try {
+      const cached = JSON.parse(await fs.readFile(cachePath, 'utf8'));
+      if (validSnapshot(cached, username)) {
+        snapshot.contributions = mergeContributions(snapshot.contributions, cached.contributions, today);
+        snapshot.unavailable = false;
+      }
+    } catch (_) { /* Cache may not exist yet. */ }
+    try {
+      const prevOnline = await fetch(`https://${encodeURIComponent(gitlabUsername)}.gitlab.io/garden/data.json`, {
+        headers: { 'User-Agent': 'Hexo-Pixel-Garden' },
+        signal: AbortSignal.timeout(8000)
+      });
+      if (prevOnline.ok) {
+        const prevData = await prevOnline.json();
+        if (validSnapshot(prevData, username)) {
+          snapshot.contributions = mergeContributions(snapshot.contributions, prevData.contributions, today);
+          snapshot.unavailable = false;
+        }
+      }
+    } catch (_) { /* Online published snapshot optional. */ }
+    try {
       const localSnap = JSON.parse(await fs.readFile(localSnapshotPath, 'utf8'));
       if (validSnapshot(localSnap, username)) {
         const merged = mergeContributions(snapshot.contributions, localSnap.contributions, today);
@@ -124,21 +146,27 @@ async function generate(hexo, options = {}) {
       }
     } catch (_) { /* Optional local git snapshot not present or invalid. */ }
     try {
-      const glRes = await fetch(`https://gitlab.com/api/v4/users/${encodeURIComponent(gitlabUsername)}/events?action=pushed&per_page=100`, {
-        headers: { 'User-Agent': 'Hexo-Pixel-Garden' },
-        signal: AbortSignal.timeout(10000)
-      });
-      if (glRes.ok) {
-        const glContribs = parseGitLabEvents(await glRes.json(), timezone);
-        if (glContribs.length > 0) {
-          snapshot = {
-            username,
-            updatedAt: new Date().toISOString(),
-            source: 'merged',
-            contributions: mergeContributions(snapshot.contributions, glContribs, today),
-            unavailable: false
-          };
-        }
+      const allGlEvents = [];
+      for (let page = 1; page <= 5; page++) {
+        const glRes = await fetch(`https://gitlab.com/api/v4/users/${encodeURIComponent(gitlabUsername)}/events?action=pushed&per_page=100&page=${page}`, {
+          headers: { 'User-Agent': 'Hexo-Pixel-Garden' },
+          signal: AbortSignal.timeout(10000)
+        });
+        if (!glRes.ok) break;
+        const pageEvents = await glRes.json();
+        if (!Array.isArray(pageEvents) || pageEvents.length === 0) break;
+        allGlEvents.push(...pageEvents);
+        if (pageEvents.length < 100 || pageEvents[pageEvents.length - 1].created_at < '2026-11-07T01:40:00Z') break;
+      }
+      const glContribs = parseGitLabEvents(allGlEvents, timezone);
+      if (glContribs.length > 0) {
+        snapshot = {
+          username,
+          updatedAt: new Date().toISOString(),
+          source: 'merged',
+          contributions: mergeContributions(snapshot.contributions, glContribs, today),
+          unavailable: false
+        };
       }
     } catch (_) { /* GitLab live events optional fallback. */ }
   }
