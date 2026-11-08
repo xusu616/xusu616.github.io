@@ -48,12 +48,12 @@ function mergeContributions(listA, listB, today) {
       }
     }
   }
-  // If today is provided, ensure the rolling 370-day window has no gaps (0 default),
-  // while preserving all older dates present in listA or listB (e.g. 2024-2025).
+  // Ensure all days from 2025-01-01 (or -730 days) up to today have at least 0
+  // so scrolling backward in Month/Week view never shows '?' (count: null) while GitHub is unavailable.
   if (today && /^\d{4}-\d{2}-\d{2}$/.test(today)) {
-    for (let offset = -370; offset <= 0; offset++) {
+    for (let offset = -730; offset <= 0; offset++) {
       const date = garden.shiftDate(today, offset);
-      if (!map.has(date)) map.set(date, 0);
+      if (date >= '2025-01-01' && !map.has(date)) map.set(date, 0);
     }
   }
   return Array.from(map.entries())
