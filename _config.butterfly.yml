@@ -631,9 +631,9 @@ twikoo:
 # Giscus
 # https://giscus.app/
 giscus:
-  repo: rD227/blog-Comment
-  repo_id: R_kgDOT7DVRA
-  category_id: DIC_kwDOT7DVRM4DDkRL
+  repo: xusu616/comment-repo
+  repo_id: R_kgDOVoxryw
+  category_id: DIC_kwDOVoxry84DKxbG
   light_theme: light
   dark_theme: dark
   js: https://giscus.app/client.js
