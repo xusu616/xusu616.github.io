@@ -33,6 +33,9 @@ ai写的这一段，我懒得打了。。
    - 在 Vivado 最左侧的 Flow Navigator 导航栏（顶部 PROJECT MANAGER 分类下），点击 Add Sources（或者按快捷键 Alt + A）
 2. 选择仿真类型：
    - 在弹出的对话框中，勾选 Add or create simulation sources，然后点击 Next
+
+    ![pam6t22-i10amg2-2026-11-10-08-10-06](/img/pam6t22-i10amg2-2026-11-10-08-10-06.png)
+   
 3. 新建文件：
    - 点击 Create File 按钮；
    - File type 选择 Verilog 或 SystemVerilog，输入文件名（例如 tb_my_test.v），点击 OK，最后点 Finish
@@ -41,6 +44,8 @@ ai写的这一段，我懒得打了。。
    - 双击刚新建的文件，就可以在 Vivado 中编写测试激励了（如生成时钟 `#10 clk = ~clk;`、给初始输入等）
 5. 运行仿真查看波形：
    - 写完保存后，点击左侧导航栏 SIMULATION 分类下的 Run Simulation → Run Behavioral Simulation 即可调出波形
+
+
 
 # 调出窗口
 
@@ -55,6 +60,39 @@ ai写的这一段，我懒得打了。。
 emmm
 
 应该就这样了
+
+## 如何切换模拟源？
+
+>点击run simulation 直接选择了工程文件来模拟（工程文件使用了ps端的时钟，就会一片黑
+
+![pam34t22-i19amg2-2026-11-10-08-19-34](/img/pam34t22-i19amg2-2026-11-10-08-19-34.png)
+
+在这里点击最左边窗口的 source
+
+切换顶端模块
+
+![pam17t22-i25amg2-2026-11-10-08-25-17](/img/pam17t22-i25amg2-2026-11-10-08-25-17.png)
+
+即可
+
+或者
+
+  1. 在最左侧 Flow Navigator 导航栏中，点击 Settings（齿轮图标）
+  2. 在左侧分类中点击 Simulation
+  3. 在右侧找到 Simulation top module name，点击它右边的 ... 按钮
+  4. 在弹出的窗口中会列出当前工程中所有可仿真的模块，直接选中你要跑的模块，点击 OK 即可
+
+如果不在标准目录，在这里就不会显示，你可以显式指定
+
+```tcl
+open_wave_database D:/Users/xvsu/FPGA_OLED_Clock/simulation/out/led_sim.wdb
+```
+
+**或者点击菜单栏 File -> Open Static Simulation...，选择 D:\Users\xvsu\FPGA_OLED_Clock\simulation\out\led_sim.wdb**
+
+最后显示的就是
+
+![pam51t22-i30amg2-2026-11-10-08-30-51](/img/pam51t22-i30amg2-2026-11-10-08-30-51.png)
 
 # 仿真文件与工程文件的区别
 
@@ -137,6 +175,8 @@ endmodule
 #### 3. 仿真文件（时钟源模型）：ipcore_clock_model.v
 
 > 作用：在电脑仿真里模拟 ARM/ZYNQ 核心吐出的 50MHz 连续时钟脉冲
+
+（ai注释：）
 
 ```verilog
 `timescale 1ns / 1ps
